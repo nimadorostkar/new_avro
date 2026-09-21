@@ -1,0 +1,71 @@
+# AVRO! — Taste the Sunrise
+
+A scroll-driven product hero for AVRO! cold drinks, built with Next.js (App Router), React 19 and TypeScript. One snap-scroll step per drink: the cup tumbles out, the landscape changes through an iris that opens from the cup, ingredients are thrown out of it, and the headline, caption and callouts follow.
+
+## Getting started
+
+```bash
+npm install
+npm run dev
+```
+
+Open <http://localhost:3000>.
+
+| Script              | What it does                              |
+| ------------------- | ----------------------------------------- |
+| `npm run dev`       | Development server with fast refresh      |
+| `npm run build`     | Production build (static, prerendered)    |
+| `npm run start`     | Serve the production build                |
+| `npm run lint`      | ESLint (next/core-web-vitals + TypeScript) |
+| `npm run typecheck` | `tsc --noEmit`                            |
+| `npm run check`     | Typecheck + lint                          |
+
+Requires Node 20.9 or newer.
+
+## Configuration
+
+Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SITE_URL` to the canonical origin. It feeds the Open Graph tags, `robots.txt` and `sitemap.xml`.
+
+## Project layout
+
+```
+public/
+  backgrounds/   one graded landscape per drink (+ the berry splash flash)
+  cups/          product photos, one per drink
+  sprites/       cut-out ingredients that float around the cup
+  sides/         optional foreground plants
+  brand/         logo
+src/
+  app/           layout (fonts, metadata), page, 404, icon, robots, sitemap, manifest
+  components/hero/
+    Hero.tsx     the markup; renders once, then hands the DOM to the engine
+    engine.ts    the motion: swaps, parallax, canvas air; returns a disposer
+    scene.ts     scene constants + pure geometry shared by markup and engine
+    hero.css     the look; everything inside the scene is in `--u` artwork units
+  data/
+    drinks.ts    the menu — names, copy, colours, ingredient positions
+    sprites.ts   sprite files with their intrinsic sizes
+  lib/site.ts    site name, description, URL, navigation
+```
+
+## Editing the menu
+
+Everything a drink needs lives in one object in [`src/data/drinks.ts`](src/data/drinks.ts). To add a drink:
+
+1. Drop a cup photo (transparent WebP, 464×640) in `public/cups/` and a 1668×943 landscape in `public/backgrounds/`.
+2. Add any new ingredient cut-outs to `public/sprites/` and register them in `src/data/sprites.ts` with their pixel size.
+3. Append a `Drink` entry. Ingredient positions (`bits`) are `[sprite, centerX, centerY, width, rotation, blur]` in artwork pixels of the 1668×943 scene; the cup sits at (848, 494).
+
+`fall` lists the sprites that drift through the air and burst out of the cup on arrival; `petals` is a fallback list of flat colours for drinks without a `fall` set. Assign `PLANTATION_SIDES` to a drink's `sides` to frame it with foreground plants.
+
+## How the motion works
+
+- The scene is authored at 1668×943 and cover-fitted; `--u` is one artwork pixel in CSS pixels, so every element is positioned in source coordinates and scales with the viewport.
+- `scroll-snap` on the document plus one `100svh` section per drink turns the wheel into a stepper; a `scroll` listener maps `scrollY` to the drink index and calls `go(n)`.
+- `go(n)` cancels whatever is in flight and runs the swap with the Web Animations API, so fast scrolling never leaves stale timers or half-finished states.
+- A single `requestAnimationFrame` loop drives pointer parallax, the cup's 3D tilt and the canvas "air" (dust motes, falling leaves, confetti).
+- `prefers-reduced-motion` collapses every transition to an instant state change and disables the canvas, drops and shockwave.
+
+## Deployment
+
+The site is fully static (`next build` prerenders every route). Deploy to Vercel with defaults, or run `npm run build && npm run start` behind any Node host. Artwork under `/backgrounds`, `/cups`, `/sprites`, `/sides` and `/brand` is served with a one-year immutable cache; rename a file if you replace it.

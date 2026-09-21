@@ -100,7 +100,7 @@ export function Hero({ drinks }: Props) {
                             alt={`AVRO! ${d.name} in a clear cup with a black lid`}
                             width={464}
                             height={640}
-                            sizes="(max-width: 820px) 60vw, 25vw"
+                            sizes="(min-aspect-ratio: 1668/943) 24vw, 42vh"
                             priority={i === 0}
                           />
                           <i className="rim shade1" />

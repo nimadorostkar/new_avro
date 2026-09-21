@@ -7,10 +7,11 @@ export const SITE = {
   locale: "en",
   /** Primary navigation. These are placeholders until the sections exist. */
   nav: [
-    { label: "BEANS", href: "#beans" },
-    { label: "THE RITUAL", href: "#ritual" },
-    { label: "ORIGINS", href: "#origins" },
-    { label: "SUSTAINABILITY", href: "#sustainability" },
+    { label: "MENU", href: "#menu" },
+    { label: "CONTACT", href: "#contact" },
+    { label: "ABOUT US", href: "#about" },
+    { label: "ORDER NOW", href: "#order" },
   ],
-  shop: { label: "SHOP NOW", href: "#shop" },
+  /** The action link at the right of the nav (and last in the mobile menu). */
+  action: { label: "LOGIN", href: "#login" },
 } as const;

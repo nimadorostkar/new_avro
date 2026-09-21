@@ -194,8 +194,8 @@ export function Hero({ drinks }: { drinks: readonly Drink[] }) {
             ))}
           </div>
           <div className="right">
-            <a className="shop" href={SITE.shop.href}>
-              {SITE.shop.label}
+            <a className="action" href={SITE.action.href}>
+              {SITE.action.label}
             </a>
             <button type="button" className="burger" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu" data-menu-open>
               <span />
@@ -262,7 +262,7 @@ export function Hero({ drinks }: { drinks: readonly Drink[] }) {
           <span />
         </button>
         <nav className="menu-links" aria-label="Primary">
-          {[...SITE.nav, SITE.shop].map((l, i) => (
+          {[...SITE.nav, SITE.action].map((l, i) => (
             <a key={l.href} href={l.href} style={{ "--i": i } as React.CSSProperties}>
               {l.label}
             </a>

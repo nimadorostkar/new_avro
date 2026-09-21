@@ -45,7 +45,7 @@ scripts/
   build-engine.mjs      esbuild bundle of the browser script (public/hero.js)
   dev.mjs               `next dev` with the engine rebuilt on change
 src/
-  pages/         _app (fonts, global CSS), _document, index (no runtime JS), 404
+  pages/         _app (fonts, global CSS), _document, index (no runtime JS), about, contact, 404
   app/           metadata routes only: icon, robots, sitemap, manifest
   components/hero/
     Hero.tsx     server-rendered markup with `data-*` hooks; runs at build time only
@@ -54,11 +54,18 @@ src/
     menu.ts      the burger and the full-screen menu
     scene.ts     scene constants + pure geometry shared by markup and engine
     hero.css     the look; everything inside the scene is in `--u` artwork units
+  components/site/
+    Shell.tsx    frame, header and footer for the About and Contact pages (RTL, Persian type)
   data/
     drinks.ts    the menu — names, copy, colours, ingredient positions
+    venue.ts     the café: tagline, address, phone, hours (About and Contact copy)
     sprites.ts   sprite files with their intrinsic sizes
   lib/site.ts    site name, description, URL, navigation
 ```
+
+## About and Contact
+
+`/about` and `/contact` are static pages in the hero's visual language (night, glow, corner brackets) set in Persian, right-to-left, with Vazirmatn from `next/font`. Their copy lives in [`src/data/venue.ts`](src/data/venue.ts); the shared frame is [`Shell.tsx`](src/components/site/Shell.tsx). Like the home page they ship no JavaScript.
 
 ## Editing the menu
 

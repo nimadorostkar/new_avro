@@ -1,0 +1,133 @@
+/* ---------- secondary pages (About, Contact): the hero's night, glow and frame, Persian type, RTL ---------- */
+/* entrances only: the resting state is fully visible, so nothing depends on an animation having run */
+@keyframes reveal { from { opacity: 0; } }
+@keyframes reveal-up { from { opacity: 0; transform: translateY(14px); } }
+@keyframes reveal-down { from { opacity: 0; transform: translateY(-10px); } }
+.page {
+  --fa: var(--font-fa), var(--sans);
+  position: relative; isolation: isolate; min-height: 100svh;
+  display: grid; grid-template-rows: auto 1fr auto;
+  padding: var(--pad-y) var(--pad-x);
+}
+.page-glow {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(55% 50% at 80% 18%, rgba(255, 214, 140, 0.22), transparent 70%),
+    radial-gradient(45% 45% at 12% 92%, rgba(200, 32, 42, 0.12), transparent 70%);
+  animation: reveal 1.6s ease both;
+}
+/* the hero's .frame draws the border and corner brackets; here it spans the whole page */
+.page-frame { position: absolute; inset: var(--pad-y) var(--pad-x); border: 1px solid rgba(246, 241, 230, 0.22); pointer-events: none; animation: reveal 1s ease both; }
+.page-frame::before {
+  content: ""; position: absolute; inset: -1px;
+  background:
+    linear-gradient(var(--ink), var(--ink)) 0 0/14px 1px, linear-gradient(var(--ink), var(--ink)) 0 0/1px 14px,
+    linear-gradient(var(--ink), var(--ink)) 100% 0/14px 1px, linear-gradient(var(--ink), var(--ink)) 100% 0/1px 14px,
+    linear-gradient(var(--ink), var(--ink)) 0 100%/14px 1px, linear-gradient(var(--ink), var(--ink)) 0 100%/1px 14px,
+    linear-gradient(var(--ink), var(--ink)) 100% 100%/14px 1px, linear-gradient(var(--ink), var(--ink)) 100% 100%/1px 14px;
+  background-repeat: no-repeat;
+}
+
+/* header: the hero's nav, in flow */
+.page-nav {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 12px clamp(14px, 2vw, 30px);
+  min-height: clamp(54px, 6.2vw, 88px); padding: 10px clamp(14px, 2vw, 30px);
+  border-bottom: 1px solid rgba(246, 241, 230, 0.22);
+  font: 600 clamp(11px, 0.92vw, 14px) / 1 var(--mono); letter-spacing: 0.08em;
+  animation: reveal-down 0.8s var(--ease) both;
+}
+.page-nav .brand { padding: 0; }
+.page-links { display: flex; align-items: center; flex-wrap: wrap; gap: 10px clamp(14px, 2.6vw, 46px); margin-inline-start: auto; }
+.page-links a { position: relative; padding: 8px 0; }
+.page-links a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 2px; height: 1px; background: var(--ink);
+  transform: scaleX(0); transform-origin: left; transition: transform 0.45s var(--ease);
+}
+.page-links a:hover::after, .page-links a[aria-current="page"]::after { transform: scaleX(1); }
+.page-links a[aria-current="page"] { color: var(--crema); }
+.page-action { margin-inline-start: clamp(10px, 2vw, 30px); padding-inline-start: clamp(14px, 2vw, 30px); border-inline-start: 1px solid rgba(246, 241, 230, 0.22); }
+
+/* content */
+.page-main {
+  font-family: var(--fa); text-align: start;
+  padding: clamp(32px, 7vh, 84px) clamp(16px, 4vw, 64px) clamp(40px, 8vh, 96px);
+  width: min(100%, 1180px); margin: 0 auto;
+}
+.eyebrow {
+  display: flex; align-items: center; gap: 0.8em;
+  font: 700 clamp(12px, 0.95vw, 14px) / 1 var(--fa); color: var(--crema);
+  animation: reveal-up 0.7s 0.1s var(--ease) both;
+}
+.eyebrow::before { content: ""; width: 2.4em; height: 1px; background: var(--crema); }
+.statement {
+  margin-top: clamp(16px, 2.6vh, 28px); max-width: 24ch;
+  font: 700 clamp(28px, 4.6vw, 66px) / 1.35 var(--fa); text-wrap: balance;
+  animation: reveal-up 0.9s 0.2s var(--ease) both;
+}
+.lede {
+  margin-top: clamp(18px, 3vh, 30px); max-width: 44ch;
+  font: 400 clamp(17px, 1.6vw, 24px) / 1.9 var(--fa); color: rgba(246, 241, 230, 0.78);
+  animation: reveal-up 0.9s 0.35s var(--ease) both;
+}
+
+/* about: the three promises */
+.pillars {
+  list-style: none; margin-top: clamp(32px, 7vh, 72px); max-width: 860px; border-top: 1px solid rgba(246, 241, 230, 0.22);
+  animation: reveal 0.9s 0.5s ease both;
+}
+.pillars li {
+  display: flex; align-items: baseline; gap: clamp(16px, 3vw, 48px);
+  padding: clamp(18px, 3vh, 30px) 0; border-bottom: 1px solid rgba(246, 241, 230, 0.18);
+  transition: color 0.35s, padding-inline-start 0.5s var(--ease);
+}
+.pillars li:hover { color: var(--crema); padding-inline-start: 0.6em; }
+.pillar-num { font: 600 clamp(11px, 0.9vw, 13px) / 1 var(--mono); letter-spacing: 0.08em; color: var(--crema); min-width: 2.4em; }
+.pillar-name { font: 400 clamp(24px, 3.2vw, 44px) / 1.3 var(--fa); }
+
+/* buttons */
+.page-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(32px, 6vh, 64px); animation: reveal 0.9s 0.7s ease both; }
+.button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6em;
+  padding: 14px 24px; border: 1px solid var(--ink);
+  font: 700 clamp(13px, 1vw, 15px) / 1 var(--fa);
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+.button:hover, .button:focus-visible { background: var(--ink); color: var(--night); }
+.button.ghost { border-color: rgba(246, 241, 230, 0.35); }
+.button.ghost:hover { border-color: var(--ink); }
+
+/* contact: address + hours as two cells of one grid, hairlines between them */
+.cards {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 1px;
+  margin-top: clamp(32px, 7vh, 72px); background: rgba(246, 241, 230, 0.18); border: 1px solid rgba(246, 241, 230, 0.18);
+  animation: reveal-up 0.9s 0.45s var(--ease) both;
+}
+.card { background: var(--night); padding: clamp(24px, 3.5vw, 48px); display: flex; flex-direction: column; align-items: flex-start; }
+.card h2 { display: flex; align-items: center; gap: 0.8em; font: 700 clamp(12px, 0.95vw, 14px) / 1 var(--fa); color: var(--crema); }
+.card h2::before { content: ""; width: 2.4em; height: 1px; background: var(--crema); }
+.card address { font-style: normal; display: grid; gap: 0.2em; margin-top: clamp(18px, 3vh, 28px); font: 400 clamp(20px, 2.2vw, 30px) / 1.55 var(--fa); }
+.phone { display: inline-block; margin-top: clamp(18px, 3vh, 28px); padding-bottom: 4px; border-bottom: 1px solid rgba(246, 241, 230, 0.35); font: 600 clamp(16px, 1.5vw, 22px) / 1 var(--mono); letter-spacing: 0.04em; transition: border-color 0.3s, color 0.3s; }
+.phone:hover { color: var(--crema); border-color: var(--crema); }
+.card .button { margin-top: clamp(24px, 4vh, 36px); }
+.hours { width: 100%; margin-top: clamp(18px, 3vh, 28px); }
+.hours div { display: flex; justify-content: space-between; align-items: baseline; gap: 1em; padding: 16px 0; border-bottom: 1px solid rgba(246, 241, 230, 0.18); }
+.hours div:last-child { border-bottom: 0; }
+.hours dt { font: 400 clamp(17px, 1.6vw, 22px) / 1.5 var(--fa); }
+.hours dd { font: 700 clamp(19px, 1.9vw, 26px) / 1.5 var(--fa); color: var(--crema); white-space: nowrap; }
+
+.page-foot {
+  display: flex; justify-content: space-between; gap: 16px; padding: 16px clamp(14px, 2vw, 30px);
+  border-top: 1px solid rgba(246, 241, 230, 0.22);
+  font: 600 clamp(10px, 0.82vw, 12px) / 1 var(--mono); letter-spacing: 0.08em; opacity: 0.6;
+}
+.page-foot span:last-child { font-family: var(--fa); letter-spacing: 0; }
+
+@media (max-width: 640px) {
+  .page-nav { padding: 12px 14px; }
+  .page-links { width: 100%; margin-inline-start: 0; gap: 8px 16px; }
+  .page-action { margin-inline-start: auto; }
+  .page-main { padding-inline: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page *, .page *::before { animation-duration: 0.01s !important; animation-delay: 0s !important; }
+}

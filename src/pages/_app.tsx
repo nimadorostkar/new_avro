@@ -2,6 +2,7 @@ import type { AppProps } from "next/app";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import "@/components/hero/hero.css";
+import "@/styles/pages.css";
 
 const geistSans = Geist({
   subsets: ["latin"],

@@ -8,8 +8,8 @@ export const SITE = {
   /** Primary navigation. These are placeholders until the sections exist. */
   nav: [
     { label: "MENU", href: "#menu" },
-    { label: "CONTACT", href: "#contact" },
-    { label: "ABOUT US", href: "#about" },
+    { label: "CONTACT", href: "/contact" },
+    { label: "ABOUT US", href: "/about" },
     { label: "ORDER NOW", href: "#order" },
   ],
   /** The action link at the right of the nav (and last in the mobile menu). */

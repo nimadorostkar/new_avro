@@ -226,12 +226,6 @@ export function Hero({ drinks }: { drinks: readonly Drink[] }) {
         </h1>
 
         <p className="note">
-          <svg viewBox="0 0 58 26" aria-hidden="true">
-            <rect x=".5" y=".5" width="57" height="25" />
-            <circle cx="21" cy="13" r="10" />
-            <circle cx="29" cy="13" r="10" />
-            <circle cx="37" cy="13" r="10" />
-          </svg>
           <span aria-live="polite" data-note>
             <b>{first.name}</b>
             {first.note}

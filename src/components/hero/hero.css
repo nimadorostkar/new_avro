@@ -299,8 +299,6 @@ html:has(.avro) {
   font: 600 clamp(11px, 1.02vw, 16px) / 1.5 var(--mono); letter-spacing: 0.06em; text-transform: uppercase;
   opacity: 0; transform: translateY(12px); animation: navIn 1.4s 1.9s var(--ease) forwards;
 }
-.note svg { display: block; width: 3.6em; height: 1.6em; margin-bottom: 2.4em; }
-.note svg * { fill: none; stroke: var(--ink); stroke-width: 1; }
 .note b { display: block; font-weight: 600; color: var(--crema); margin-bottom: 0.6em; }
 
 .rail {
@@ -350,7 +348,6 @@ html:has(.avro) {
   .title { font-size: clamp(52px, 17vw, 120px); }
   .w2 { right: auto; left: calc(var(--pad-x) + 2.4vw); top: calc(var(--pad-y) + var(--nav-h, clamp(54px, 6.2vw, 88px)) + 2.2vw + 0.86em); }
   .note { bottom: calc(var(--pad-y) + min(21vw, 150px)); width: 22ch; font-size: clamp(11px, 3vw, 13px); }
-  .note svg { margin-bottom: 1.6em; }
 }
 @media (max-height: 560px) and (orientation: landscape) {
   .avro { --cs: 0.92; --cty: -12; --nav-h: 44px; }
@@ -358,7 +355,6 @@ html:has(.avro) {
   .w1, .w2 { top: calc(var(--pad-y) + var(--nav-h) + 1vh); }
   .w3 { bottom: calc(var(--pad-y) + 1vh); }
   .note { width: 26ch; bottom: calc(var(--pad-y) + 1.4vh); font-size: 10px; line-height: 1.4; }
-  .note svg { width: 2.8em; height: 1.2em; margin-bottom: 1em; }
   .rail { gap: 6px; }
   .rail .cue { height: 28px; }
   .brand img { height: 20px; }

@@ -65,7 +65,7 @@ src/
 
 ## Menu
 
-`/menu` lists every drink in [`src/data/drinks.ts`](src/data/drinks.ts) as a hairline grid of cards (number, cup, "Taste the …" in the drink's accent colour, name, note, tags). Each card links to that drink's step on the home page. Cups beyond the first row load lazily, so adding drinks costs nothing on first paint; on phones the cards collapse to rows.
+`/menu` lists every drink in [`src/data/drinks.ts`](src/data/drinks.ts) as a hairline grid of cards, in Persian (each drink's `fa` block: name, word, note, tags). Clicking a card opens a popup built on CSS `:target` — no framework, no script beyond Escape handling: the drink's landscape irises open from the cup with a shockwave in the drink's colour, the cup tumbles in, the copy climbs up, with prev/next and a link to the drink's step on the home page. Landscapes load only when a popup opens; cups beyond the first row load lazily, so adding drinks costs nothing on first paint. On phones the cards collapse to rows and the popup stacks.
 
 ## About and Contact
 

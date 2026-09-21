@@ -26,6 +26,8 @@ export type Drink = {
   /** Two callout labels pinned to the cup. */
   tags: readonly [string, string];
   note: string;
+  /** Persian copy for the menu page. */
+  fa: { name: string; word: string; note: string; tags: readonly [string, string] };
   /** Image paths without extension; served as AVIF with a WebP fallback. */
   cup: string;
   bg: string;
@@ -60,6 +62,12 @@ export const DRINKS: readonly Drink[] = [
     word: "Sunrise",
     tags: ["COLD-BREWED 18H", "HAND-PICKED"],
     note: "Mountain-grown coffee, shaken cold for slow mornings and long afternoons",
+    fa: {
+      name: "آیس لاته",
+      word: "طلوع",
+      note: "قهوه کوهستانی، سرد شیک‌شده برای صبح‌های آرام و بعدازظهرهای طولانی",
+      tags: ["دم‌سرد ۱۸ ساعته", "دست‌چین"],
+    },
     cup: "/cups/iced-latte",
     bg: "/backgrounds/iced-latte",
     color: "#f0d29a",
@@ -82,6 +90,12 @@ export const DRINKS: readonly Drink[] = [
     word: "Horizon",
     tags: ["WILD BLUEBERRY", "RIPE MANGO"],
     note: "Blueberry over cold milk, resting on a layer of ripe mango",
+    fa: {
+      name: "بلو منگو",
+      word: "افق",
+      note: "بلوبری روی شیر سرد، نشسته بر لایه‌ای از انبه رسیده",
+      tags: ["بلوبری وحشی", "انبه رسیده"],
+    },
     cup: "/cups/blue-mango",
     bg: "/backgrounds/blue-mango",
     flash: "/backgrounds/berry-splash",
@@ -110,6 +124,12 @@ export const DRINKS: readonly Drink[] = [
     word: "Garden",
     tags: ["STONE-GROUND MATCHA", "RIPE MANGO"],
     note: "Whisked matcha and cold milk poured slowly over ripe mango",
+    fa: {
+      name: "ماچا منگو",
+      word: "باغ",
+      note: "ماچای هم‌زده و شیر سرد، آرام ریخته‌شده روی انبه رسیده",
+      tags: ["ماچای سنگ‌آسیاب", "انبه رسیده"],
+    },
     cup: "/cups/matcha-mango",
     bg: "/backgrounds/matcha-mango",
     color: "#b5d86a",
@@ -137,6 +157,12 @@ export const DRINKS: readonly Drink[] = [
     word: "Sky",
     tags: ["WILD BLUEBERRY", "FRESH MILK"],
     note: "Blueberry and cold fresh milk. Blue by nature, nothing added",
+    fa: {
+      name: "بلو لاته",
+      word: "آسمان",
+      note: "بلوبری و شیر تازه سرد. آبی از طبیعت، بدون هیچ افزودنی",
+      tags: ["بلوبری وحشی", "شیر تازه"],
+    },
     cup: "/cups/blue-latte",
     bg: "/backgrounds/blue-latte",
     flash: "/backgrounds/berry-splash",

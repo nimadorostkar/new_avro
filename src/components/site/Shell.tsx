@@ -22,7 +22,7 @@ export function Shell({ title, description, path, lang = "fa", children }: Props
   const url = `${SITE.url}${path}`;
   const dir = lang === "fa" ? "rtl" : "ltr";
   return (
-    <div className={`page ${vazirmatn.variable}`}>
+    <div className={`page ${vazirmatn.variable} ${path.slice(1)}-page`}>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <title>{`${title} — ${SITE.name}`}</title>

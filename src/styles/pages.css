@@ -133,12 +133,9 @@
 }
 
 /* ---------- menu: one hairline grid of drinks, each card a small stage for its cup ---------- */
-.page-main[lang="en"] { font-family: var(--sans); }
-.page-main[lang="en"] .eyebrow { font: 600 clamp(11px, 0.92vw, 14px) / 1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
-.page-main[lang="en"] .statement { font: 400 clamp(44px, 7vw, 120px) / 0.9 var(--sans); letter-spacing: -0.035em; text-transform: uppercase; max-width: none; }
-.page-main[lang="en"] .lede { font: 400 clamp(15px, 1.25vw, 19px) / 1.7 var(--sans); max-width: 52ch; }
 .eyebrow-count { color: rgba(246, 241, 230, 0.55); }
 .eyebrow-count::before { content: "— "; }
+.menu-page .statement { font-size: clamp(36px, 6vw, 96px); line-height: 1.2; max-width: none; }
 
 /* hairlines are drawn by the cards (overlapping in the 1px gap), so an incomplete last row leaves the night bare */
 .menu-grid {
@@ -158,33 +155,130 @@
   opacity: 0; transition: opacity 0.7s var(--ease);
 }
 .drink:hover::before, .drink:focus-visible::before { opacity: 0.6; }
-.drink-top { display: flex; justify-content: space-between; align-items: baseline; font: 600 clamp(10px, 0.82vw, 12px) / 1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.drink-top { display: flex; justify-content: space-between; align-items: baseline; font: 700 clamp(11px, 0.9vw, 13px) / 1 var(--fa); }
 .drink-num { color: var(--crema); }
-.drink-cta { opacity: 0; transform: translateX(6px); transition: opacity 0.4s, transform 0.5s var(--ease); }
-.drink-cta::after { content: " \2197"; }
+.drink-cta { opacity: 0; transform: translateX(-6px); transition: opacity 0.4s, transform 0.5s var(--ease); }
+.drink-cta::after { content: " \2196"; }
 .drink:hover .drink-cta, .drink:focus-visible .drink-cta { opacity: 1; transform: none; }
 .drink-cup {
   display: block; width: min(56%, 200px); margin: 0 auto; align-self: center;
   filter: drop-shadow(0 22px 26px rgba(0, 0, 0, 0.5));
-  transform: rotate(7deg); transition: transform 0.8s var(--ease);
+  transform: rotate(-7deg); transition: transform 0.8s var(--ease);
 }
 .drink:hover .drink-cup, .drink:focus-visible .drink-cup { transform: rotate(0) translateY(-10px) scale(1.04); }
 .drink-cup img { display: block; width: 100%; height: auto; filter: contrast(1.06) saturate(1.14) brightness(0.97); }
 .drink-body { display: grid; gap: 10px; }
-.drink-word { font: 600 clamp(10px, 0.82vw, 12px) / 1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
-.drink-name { font: 400 clamp(26px, 2.4vw, 38px) / 0.95 var(--sans); letter-spacing: -0.025em; text-transform: uppercase; }
-.drink-note { font: 400 clamp(13px, 1vw, 15px) / 1.6 var(--sans); color: rgba(246, 241, 230, 0.72); }
+.drink-word { font: 700 clamp(11px, 0.9vw, 13px) / 1.4 var(--fa); color: var(--accent); }
+.drink-name { font: 700 clamp(24px, 2.2vw, 34px) / 1.25 var(--fa); }
+.drink-note { font: 400 clamp(13px, 1vw, 15px) / 1.8 var(--fa); color: rgba(246, 241, 230, 0.75); }
 .drink-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.drink-tags span { font: 600 10px / 1 var(--mono); letter-spacing: 0.06em; padding: 7px 9px; border: 1px solid rgba(246, 241, 230, 0.25); transition: border-color 0.3s, color 0.3s; }
+.drink-tags span { font: 700 11px / 1 var(--fa); padding: 7px 9px; border: 1px solid rgba(246, 241, 230, 0.25); transition: border-color 0.3s, color 0.3s; }
 .drink:hover .drink-tags span { border-color: var(--accent); color: var(--accent); }
 
 /* phones: the cup moves beside the copy so the list stays scannable at fifty items */
 @media (max-width: 560px) {
   .drink { grid-template-columns: 34% 1fr; grid-template-rows: auto auto; gap: 14px 18px; padding: 18px 16px; }
   .drink-top { grid-column: 1 / -1; }
-  .drink-cup { width: 100%; align-self: start; transform: rotate(5deg); }
+  .drink-cup { width: 100%; align-self: start; transform: rotate(-5deg); }
   .drink-body { align-self: center; }
 }
 @media (hover: none) {
   .drink-cta { opacity: 0.6; transform: none; }
+}
+
+/* ---------- the popup: pure CSS, shown while its id is the URL hash ----------
+   the drink's landscape irises open from the cup, the cup tumbles in and settles, the copy climbs up */
+.lightbox { display: none; position: fixed; inset: 0; z-index: 20; isolation: isolate; }
+.lightbox:target { display: grid; grid-template-rows: 1fr auto; animation: reveal 0.35s ease both; }
+body:has(.lightbox:target) { overflow: hidden; }
+.lb-backdrop { position: absolute; inset: 0; background: rgba(4, 10, 6, 0.9); }
+.lb-bg {
+  position: absolute; inset: -3%; pointer-events: none;
+  background-image: var(--webp); background-position: center; background-size: cover; background-repeat: no-repeat;
+  clip-path: circle(0% at 50% 55%);
+  animation: lb-iris 1.3s 0.15s cubic-bezier(0.16, 0.84, 0.24, 1) both, lb-dawn 2.4s 0.15s cubic-bezier(0.5, 0, 0.2, 1) both;
+}
+@supports (background-image: image-set(url("a.avif") type("image/avif"))) {
+  .lb-bg { background-image: image-set(var(--avif) type("image/avif"), var(--webp) type("image/webp")); }
+}
+@media (max-aspect-ratio: 4/5) {
+  .lb-bg { background-image: var(--webp-p); }
+  @supports (background-image: image-set(url("a.avif") type("image/avif"))) {
+    .lb-bg { background-image: image-set(var(--avif-p) type("image/avif"), var(--webp-p) type("image/webp")); }
+  }
+}
+@keyframes lb-iris { to { clip-path: circle(120% at 50% 55%); } }
+@keyframes lb-dawn { from { filter: brightness(0.3) saturate(0.6); transform: scale(1.08); } to { filter: brightness(0.75) saturate(1); transform: none; } }
+.lb-shade {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(4, 10, 6, 0.55), rgba(4, 10, 6, 0.15) 35%, rgba(4, 10, 6, 0.75));
+}
+/* the shockwave: the glowing edge of the iris, in the drink's colour */
+.lb-ring {
+  position: absolute; left: 50%; top: 55%; width: 30vmin; height: 30vmin; margin: -15vmin 0 0 -15vmin; border-radius: 50%;
+  border: 2px solid var(--accent); box-shadow: 0 0 40px var(--accent), inset 0 0 40px var(--accent); mix-blend-mode: screen; pointer-events: none;
+  animation: lb-ring 1.3s 0.15s cubic-bezier(0.16, 0.84, 0.24, 1) both;
+}
+@keyframes lb-ring { from { transform: scale(0); opacity: 1; } 50% { opacity: 0.8; } to { transform: scale(7); opacity: 0; } }
+.lb-close {
+  position: absolute; top: var(--pad-y); inset-inline-end: var(--pad-x); z-index: 2; width: 64px; height: 64px; display: grid; place-content: center;
+  animation: reveal 0.6s 0.6s ease both;
+}
+.lb-close span { display: block; width: 26px; height: 2px; background: var(--ink); grid-area: 1 / 1; transition: transform 0.4s var(--ease); }
+.lb-close span:first-child { transform: rotate(45deg); }
+.lb-close span:last-child { transform: rotate(-45deg); }
+.lb-close:hover span:first-child { transform: rotate(45deg) scaleX(1.25); }
+.lb-close:hover span:last-child { transform: rotate(-45deg) scaleX(1.25); }
+.lb-panel {
+  position: relative; z-index: 1; align-self: center;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(24px, 5vw, 80px);
+  width: min(100% - 2 * var(--pad-x) - 32px, 1180px); margin: 0 auto; padding: calc(var(--pad-y) + 64px) 0 16px;
+}
+.lb-cup {
+  display: block; width: min(100%, 44vh); justify-self: center;
+  filter: drop-shadow(0 40px 44px rgba(0, 0, 0, 0.55));
+  animation: lb-cup-in 1.2s 0.25s cubic-bezier(0.17, 1.22, 0.3, 1) both, lb-float 7s 1.5s ease-in-out infinite;
+}
+.lb-cup img { display: block; width: 100%; height: auto; filter: contrast(1.06) saturate(1.14) brightness(0.97); }
+@keyframes lb-cup-in { from { opacity: 0; transform: translateY(45%) rotate(-24deg) scale(0.5); filter: blur(8px); } 55% { opacity: 1; filter: blur(0); } to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes lb-float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-14px) rotate(2deg); } }
+.lb-body { display: grid; gap: clamp(12px, 2vh, 20px); justify-items: start; }
+.lb-body > * { animation: reveal-up 0.9s var(--ease) both; }
+.lb-body > :nth-child(1) { animation-delay: 0.45s; }
+.lb-body > :nth-child(2) { animation-delay: 0.55s; }
+.lb-body > :nth-child(3) { animation-delay: 0.65s; }
+.lb-body > :nth-child(4) { animation-delay: 0.75s; }
+.lb-body > :nth-child(5) { animation-delay: 0.85s; }
+.lb-word { font: 700 clamp(12px, 1vw, 14px) / 1.4 var(--fa); color: var(--accent); }
+.lb-num { color: var(--crema); margin-inline-end: 0.6em; }
+.lb-name { font: 700 clamp(40px, 6vw, 92px) / 1.15 var(--fa); }
+.lb-note { font: 400 clamp(16px, 1.4vw, 21px) / 1.9 var(--fa); color: rgba(246, 241, 230, 0.85); max-width: 40ch; }
+.lb-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.lb-tags span { font: 700 12px / 1 var(--fa); padding: 9px 12px; border: 1px solid var(--accent); color: var(--accent); }
+.lb-body .button { margin-top: 8px; }
+.lb-nav {
+  position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 16px;
+  width: min(100% - 2 * var(--pad-x) - 32px, 1180px); margin: 0 auto; padding: 16px 0 calc(var(--pad-y) + 16px);
+  font: 700 clamp(12px, 1vw, 14px) / 1 var(--fa);
+  animation: reveal 0.8s 0.9s ease both;
+}
+.lb-nav a { display: inline-flex; align-items: center; gap: 0.6em; padding: 10px 0; opacity: 0.7; transition: opacity 0.3s, color 0.3s; }
+.lb-nav a:hover { opacity: 1; color: var(--crema); }
+.lb-nav-label { color: rgba(246, 241, 230, 0.5); font-weight: 400; }
+.lb-nav a:first-child .lb-nav-label::before { content: "\2192\00a0"; }
+.lb-nav a:last-child .lb-nav-label::after { content: "\00a0\2190"; }
+
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  .lightbox:target { overflow-y: auto; }
+  .lb-panel { grid-template-columns: 1fr; gap: 12px; padding-top: calc(var(--pad-y) + 56px); align-self: start; }
+  .lb-cup { width: min(52%, 34vh); }
+  .lb-body { justify-items: center; text-align: center; }
+  .lb-name { font-size: clamp(34px, 9vw, 56px); }
+  .lb-note { font-size: clamp(15px, 4vw, 18px); }
+  .lb-tags { justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lb-bg { clip-path: none; }
+  .lb-ring { display: none; }
+  .lb-cup { animation: none; }
 }

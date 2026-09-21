@@ -71,6 +71,16 @@ Everything a drink needs lives in one object in [`src/data/drinks.ts`](src/data/
 - A single `requestAnimationFrame` loop drives pointer parallax, the cup's 3D tilt and the canvas "air" (dust motes, falling leaves, confetti).
 - `prefers-reduced-motion` collapses every transition to an instant state change and disables the canvas, drops and shockwave.
 
+## Responsive layout
+
+Three viewport classes, each handled by its own media query in [`hero.css`](src/components/hero/hero.css):
+
+- **Portrait** (`max-aspect-ratio: 1/1`) — the cover-fitted artwork shows only its middle, so the composition is pulled in: the cup scales to 78% and moves up (`--cs`, `--cty`), the ingredients are drawn in around it (`--bsx`, `--bsy`, `--bk`), and the callouts follow the cup because they are anchored to its centre. The engine reads these knobs so throws and the iris still start at the cup.
+- **Narrow** (`max-width: 820px`) — the primary links move into the full-screen menu behind the burger ([`Menu.tsx`](src/components/hero/Menu.tsx)), the rail keeps only its bars with 32px tap targets, and on portrait phones the headline stacks.
+- **Short landscape** (`max-height: 560px`) — smaller type and nav, cup at 92%, so a phone held sideways keeps the desktop arrangement.
+
+`--pad-x`/`--pad-y` include the safe-area insets, so the frame and type stay clear of notches and the home indicator.
+
 ## Performance
 
 The opening frame ships only what it shows: one landscape (AVIF, ~66 KB), one cup (~17 KB), seven small sprites, the logo, two font files and the React runtime — about 290 KB in ~24 requests, against ~1.5 MB for the original single-file page.

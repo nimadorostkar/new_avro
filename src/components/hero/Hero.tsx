@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { DRINKS, type Drink } from "@/data/drinks";
 import { SITE } from "@/lib/site";
 import { mountHero } from "./engine";
+import { Menu } from "./Menu";
 import { layoutBits, scrollToDrink, sourceData, sourceVars, sources } from "./scene";
 import "./hero.css";
 
@@ -89,20 +90,22 @@ export function Hero() {
             </div>
 
             <div className="layer" data-depth=".05" aria-hidden="true">
-              {drinks.map((d, n) => (
-                <div key={d.slug} className={eager(n) ? "set on" : "set"} data-set={n}>
-                  {layoutBits(d, n).map((b) => (
-                    <div key={b.key} className="bit" style={b.style}>
-                      <i
-                        className={b.flat ? (eager(n) ? "in intro" : "in") : "in ph"}
-                        style={eager(n) ? { ...b.innerStyle, ...sourceVars(b.sources) } : b.innerStyle}
-                        {...(eager(n) ? {} : sourceData(b.sources))}
-                        data-bit
-                      />
-                    </div>
-                  ))}
-                </div>
-              ))}
+              <div className="bits">
+                {drinks.map((d, n) => (
+                  <div key={d.slug} className={eager(n) ? "set on" : "set"} data-set={n}>
+                    {layoutBits(d, n).map((b) => (
+                      <div key={b.key} className="bit" style={b.style}>
+                        <i
+                          className={b.flat ? (eager(n) ? "in intro" : "in") : "in ph"}
+                          style={eager(n) ? { ...b.innerStyle, ...sourceVars(b.sources) } : b.innerStyle}
+                          {...(eager(n) ? {} : sourceData(b.sources))}
+                          data-bit
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="splash glow" data-glow />
             <div className="splash ring" data-ring />
@@ -197,11 +200,7 @@ export function Hero() {
             <a className="shop" href={SITE.shop.href}>
               {SITE.shop.label}
             </a>
-            <button type="button" className="burger" aria-label="Open menu">
-              <span />
-              <span />
-              <span />
-            </button>
+            <Menu drinks={drinks} />
           </div>
         </nav>
 

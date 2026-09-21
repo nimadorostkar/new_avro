@@ -17,6 +17,22 @@ export const prefersReducedMotion = () =>
 export const stepHeight = () =>
   document.querySelector<HTMLElement>("[data-step]")?.offsetHeight ?? window.innerHeight;
 
+/**
+ * How the stylesheet has reshaped the composition for this viewport (portrait
+ * pulls the ingredients in around a smaller, higher cup). `fx`/`fy` convert an
+ * artwork-space distance into what a sprite actually needs to travel; `cty` is
+ * the cup's vertical shift in artwork units.
+ */
+export function compaction(root: HTMLElement) {
+  const cs = getComputedStyle(root);
+  const n = (name: string, fallback: number) => {
+    const v = parseFloat(cs.getPropertyValue(name));
+    return Number.isFinite(v) ? v : fallback;
+  };
+  const k = n("--bk", 1) || 1;
+  return { fx: n("--bsx", 1) / k, fy: n("--bsy", 1) / k, cty: n("--cty", 0) };
+}
+
 export const scrollToDrink = (index: number) =>
   window.scrollTo({ top: index * stepHeight(), behavior: prefersReducedMotion() ? "auto" : "smooth" });
 
@@ -76,8 +92,9 @@ export function layoutBits(drink: Drink, drinkIndex: number): BitLayout[] {
       width: u(size),
       height: u(h),
       "--i": i,
-      "--fx": u((cx - mx) * 0.8),
-      "--fy": u((cy - my) * 0.8 + 60),
+      // the intro burst starts at the cup: scaled by the portrait compaction (see hero.css)
+      "--fx": `calc(var(--u) * ${(cx - mx) * 0.8} * var(--bsx) / var(--bk))`,
+      "--fy": `calc(var(--u) * ${(cy - my) * 0.8 + 60} * var(--bsy) / var(--bk))`,
       "--fr": `${sg * (120 + i * 25)}deg`,
       "--dx": u(-sg * (10 + i * 2)),
       "--dy": u(-(16 + ((i * 7) % 18))),

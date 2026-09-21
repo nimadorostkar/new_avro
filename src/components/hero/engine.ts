@@ -1,6 +1,6 @@
 import type { Drink } from "@/data/drinks";
 import { SPRITES, type SpriteKey } from "@/data/sprites";
-import { CUP_CENTER, SCENE, layoutBits, prefersReducedMotion, sources, stepHeight, unit, type BitGeometry } from "./scene";
+import { CUP_CENTER, SCENE, compaction, layoutBits, prefersReducedMotion, sources, stepHeight, unit, type BitGeometry } from "./scene";
 
 /*
  * The hero is rendered once by React (see Hero.tsx) and then driven here with
@@ -241,7 +241,8 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
     /* the landscape changes through an iris that opens from the cup; the shockwave ring is its glowing edge */
     const T0 = 500;
     const TD = 1500;
-    const irisAt = `${((CUP_CENTER.x / SCENE.w) * 100).toFixed(1)}% ${((CUP_CENTER.y / SCENE.h) * 100).toFixed(1)}%`;
+    const shape = compaction(root);
+    const irisAt = `${((CUP_CENTER.x / SCENE.w) * 100).toFixed(1)}% ${(((CUP_CENTER.y + shape.cty) / SCENE.h) * 100).toFixed(1)}%`;
     anim(bgs[n]!, [{ clipPath: `circle(0% at ${irisAt})` }, { clipPath: `circle(82% at ${irisAt})` }], {
       duration: TD,
       delay: T0,
@@ -278,13 +279,15 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
 
     /* ingredients: the old ones are blasted out of frame, the new ones are thrown out of the cup */
     const u = unit();
+    const ux = u * shape.fx;
+    const uy = u * shape.fy;
     sets[prev]!.items.forEach(({ inner, geometry: g }, i) =>
       anim(
         inner,
         [
           { transform: "none", opacity: 1 },
           {
-            transform: `translate(${g.ox * 420 * u}px,${(g.oy * 420 - dir * 160) * u}px) rotate(${g.sg * 320}deg) scale(.5)`,
+            transform: `translate(${g.ox * 420 * ux}px,${(g.oy * 420 - dir * 160) * uy}px) rotate(${g.sg * 320}deg) scale(.5)`,
             opacity: 0,
           },
         ],
@@ -299,7 +302,7 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
         inner,
         [
           {
-            transform: `translate(${g.dx * 0.85 * u}px,${(g.dy * 0.85 + dir * 70) * u}px) rotate(${-g.sg * 300}deg) scale(.12)`,
+            transform: `translate(${g.dx * 0.85 * ux}px,${(g.dy * 0.85 + dir * 70) * uy}px) rotate(${-g.sg * 300}deg) scale(.12)`,
             opacity: 0,
           },
           { opacity: 1, offset: 0.3 },
@@ -508,8 +511,9 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
       // confetti out of the cup in the new drink's colours
       const D = drinks[n]!;
       const cols = D.petals?.length ? D.petals : ["#f0d29a", "#8a5a2b", "#c8202a"];
+      const { cty } = compaction(root);
       const ox = W * (CUP_CENTER.x / SCENE.w);
-      const oy = H * (CUP_CENTER.y / SCENE.h);
+      const oy = H * ((CUP_CENTER.y + cty) / SCENE.h);
       for (let i = 0, N = D.fall ? 26 : 38; i < N; i++) {
         const an = Math.random() * TAU;
         const sp = (Math.random() * 9 + 4) * dp;

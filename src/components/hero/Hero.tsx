@@ -136,18 +136,18 @@ export function Hero({ drinks }: { drinks: readonly Drink[] }) {
                 <svg width="1" height="1" aria-hidden="true">
                   <polyline points="0,0 30,-34 30,-46" />
                 </svg>
-                <button type="button" className="tag" data-tag>
+                <span className="tag" data-tag>
                   {first.tags[0]}
-                </button>
+                </span>
               </div>
               <div className="call c2" data-call>
                 <i className="pin" />
                 <svg width="1" height="1" aria-hidden="true">
                   <polyline points="0,0 44,20 44,32" />
                 </svg>
-                <button type="button" className="tag" data-tag>
+                <span className="tag" data-tag>
                   {first.tags[1]}
-                </button>
+                </span>
               </div>
             </div>
 

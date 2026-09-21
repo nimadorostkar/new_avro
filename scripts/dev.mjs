@@ -3,6 +3,8 @@ import { spawn } from "node:child_process";
 import { context } from "esbuild";
 import { options } from "./build-engine.mjs";
 
+await import("./build-meta.mjs");
+
 const ctx = await context({ ...options, minify: false, logLevel: "warning" });
 await ctx.rebuild();
 await ctx.watch();

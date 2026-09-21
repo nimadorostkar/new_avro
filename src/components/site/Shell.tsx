@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import { VENUE } from "@/data/venue";
 import { vazirmatn } from "@/lib/fonts";
 import { SITE } from "@/lib/site";
 
@@ -63,10 +64,8 @@ export function Shell({ title, description, path, lang = "fa", children }: Props
       </main>
       <footer className="page-foot" dir={dir} lang={lang}>
         <span dir="ltr">{SITE.name}</span>
-        <span>{VENUE_CITY}</span>
+        <span>{VENUE.region}</span>
       </footer>
     </div>
   );
 }
-
-const VENUE_CITY = "رشت، گیلان";

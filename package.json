@@ -5,8 +5,9 @@
   "description": "AVRO! — Taste the Sunrise. Scroll-driven product hero built with Next.js.",
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "build": "npm run build:engine && next build",
+    "build": "npm run build:engine && npm run build:meta && next build",
     "build:engine": "node scripts/build-engine.mjs",
+    "build:meta": "node scripts/build-meta.mjs",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -22,6 +23,7 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@next/env": "^16.3.5",
     "@types/node": "^24.13.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

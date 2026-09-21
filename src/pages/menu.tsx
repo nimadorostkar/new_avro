@@ -4,6 +4,7 @@ import { sourceVars, sources } from "@/components/hero/scene";
 import { Shell } from "@/components/site/Shell";
 import { DRINKS } from "@/data/drinks";
 import { faDigits, faIndex } from "@/lib/fa";
+import { CLOSE_HASH, MENU_SCRIPT } from "@/lib/menu-script";
 
 export const config: PageConfig = { unstable_runtimeJS: false };
 
@@ -22,15 +23,6 @@ const COPY = {
 } as const;
 
 const lightboxId = (slug: string) => `lb-${slug}`;
-/** A hash no element owns: closes the popup without scrolling the page. */
-const CLOSE = "#_";
-
-/**
- * Escape closes the open popup and, when one opens, focus moves to its close
- * button. The page ships no other JavaScript; the popups themselves are pure
- * CSS (`:target`).
- */
-const KEYS = `addEventListener("keydown",e=>{if(e.key==="Escape"&&location.hash&&location.hash!=="${CLOSE}")location.hash="${CLOSE}"});addEventListener("hashchange",()=>document.querySelector(":target .lb-close")?.focus())`;
 
 /**
  * Every drink on the menu, generated from src/data/drinks.ts. Each card opens
@@ -95,11 +87,11 @@ export default function MenuPage() {
             aria-labelledby={`${lightboxId(d.slug)}-name`}
             style={{ "--accent": d.color, "--glow": d.sun } as React.CSSProperties}
           >
-            <a className="lb-backdrop" href={CLOSE} aria-label={COPY.close} />
+            <a className="lb-backdrop" href={CLOSE_HASH} aria-label={COPY.close} />
             <div className="lb-bg" style={sourceVars(sources(d.bg), sources(`${d.bg}-p`))} aria-hidden="true" />
             <div className="lb-shade" aria-hidden="true" />
             <div className="lb-ring" aria-hidden="true" />
-            <a className="lb-close" href={CLOSE} aria-label={COPY.close}>
+            <a className="lb-close" href={CLOSE_HASH} aria-label={COPY.close}>
               <span />
               <span />
             </a>
@@ -137,7 +129,8 @@ export default function MenuPage() {
           </section>
         );
       })}
-      <script dangerouslySetInnerHTML={{ __html: KEYS }} />
+      {/* the popups are pure CSS (:target); this only adds Escape and focus, and is hashed in the CSP */}
+      <script dangerouslySetInnerHTML={{ __html: MENU_SCRIPT }} />
     </Shell>
   );
 }

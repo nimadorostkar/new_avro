@@ -1,17 +1,14 @@
+import config from "./site.json";
+
+/**
+ * Site-wide constants. The static values live in site.json so that the build
+ * scripts (robots, sitemap, manifest) read the same source; the canonical
+ * origin comes from NEXT_PUBLIC_SITE_URL.
+ *
+ * Nav notes: ORDER NOW goes to the contact page (orders are taken by phone)
+ * and LOGIN is a placeholder until an account area exists.
+ */
 export const SITE = {
-  name: "AVRO!",
-  title: "AVRO! — Taste the Sunrise",
-  description:
-    "Cold-brewed coffee, wild blueberry and stone-ground matcha, shaken cold. Four drinks, one sunrise.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://avro.example.com",
-  locale: "en",
-  /** Primary navigation. These are placeholders until the sections exist. */
-  nav: [
-    { label: "MENU", href: "/menu" },
-    { label: "CONTACT", href: "/contact" },
-    { label: "ABOUT US", href: "/about" },
-    { label: "ORDER NOW", href: "#order" },
-  ],
-  /** The action link at the right of the nav (and last in the mobile menu). */
-  action: { label: "LOGIN", href: "#login" },
+  ...config,
+  url: (process.env.NEXT_PUBLIC_SITE_URL ?? config.fallbackUrl).replace(/\/$/, ""),
 } as const;

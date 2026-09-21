@@ -1,0 +1,21 @@
+{
+  "name": "AVRO!",
+  "title": "AVRO! — Taste the Sunrise",
+  "description": "Cold-brewed coffee, wild blueberry and stone-ground matcha, shaken cold. Four drinks, one sunrise.",
+  "locale": "en",
+  "themeColor": "#07110b",
+  "nav": [
+    { "label": "MENU", "href": "/menu" },
+    { "label": "CONTACT", "href": "/contact" },
+    { "label": "ABOUT US", "href": "/about" },
+    { "label": "ORDER NOW", "href": "/contact" }
+  ],
+  "action": { "label": "LOGIN", "href": "#login" },
+  "routes": [
+    { "path": "/", "changeFrequency": "monthly", "priority": 1 },
+    { "path": "/menu", "changeFrequency": "monthly", "priority": 0.9 },
+    { "path": "/contact", "changeFrequency": "yearly", "priority": 0.8 },
+    { "path": "/about", "changeFrequency": "yearly", "priority": 0.6 }
+  ],
+  "fallbackUrl": "https://avro.example.com"
+}

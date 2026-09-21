@@ -11,5 +11,8 @@ export const VENUE = {
     { days: "جمعه", time: "۹ تا ۲۳" },
   ],
   city: "رشت",
-  maps: "https://maps.google.com/?q=" + encodeURIComponent("AVRO! Cafe, Golsar, Deylaman Blvd, Rasht, Gilan, Iran"),
+  region: "رشت، گیلان",
 } as const;
+
+/** Google Maps search for the address as written above. */
+export const MAPS_URL = "https://maps.google.com/?q=" + encodeURIComponent(VENUE.address.join("، "));

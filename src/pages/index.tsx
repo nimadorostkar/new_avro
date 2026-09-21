@@ -16,7 +16,9 @@ export const config: PageConfig = { unstable_runtimeJS: false };
 
 export const getStaticProps = (async () => {
   // Content-hash the engine so it can be cached forever and still update with every deploy.
-  const engine = await readFile(path.join(process.cwd(), "public", "hero.js"));
+  const engine = await readFile(path.join(process.cwd(), "public", "hero.js")).catch(() => {
+    throw new Error("public/hero.js is missing: run `npm run build:engine` (or `npm run build`, which does).");
+  });
   const hash = createHash("sha256").update(engine).digest("hex").slice(0, 10);
   return { props: { engineSrc: `/hero.js?v=${hash}` } };
 }) satisfies GetStaticProps;

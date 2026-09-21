@@ -14,8 +14,9 @@ Open <http://localhost:3000>.
 | Script              | What it does                              |
 | ------------------- | ----------------------------------------- |
 | `npm run dev`       | Development server with fast refresh (rebuilds the engine on change) |
-| `npm run build`     | Builds the engine, then the static site   |
+| `npm run build`     | Builds the engine and metadata, then the static site |
 | `npm run build:engine` | Bundles the browser script alone        |
+| `npm run build:meta` | Writes robots.txt, sitemap.xml and the manifest |
 | `npm run start`     | Serve the production build                |
 | `npm run lint`      | ESLint (next/core-web-vitals + TypeScript) |
 | `npm run typecheck` | `tsc --noEmit`                            |
@@ -26,7 +27,7 @@ Requires Node 20.9 or newer.
 
 ## Configuration
 
-Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SITE_URL` to the canonical origin. It feeds the Open Graph tags, `robots.txt` and `sitemap.xml`.
+Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SITE_URL` to the canonical origin. It feeds the canonical/Open Graph URLs, `robots.txt` and `sitemap.xml` (the last two are written at build time by `scripts/build-meta.mjs`). Everything else site-wide — name, description, navigation, sitemap routes — is in [`src/lib/site.json`](src/lib/site.json).
 
 ## Project layout
 
@@ -43,10 +44,10 @@ scripts/
 scripts/
   optimize-images.mjs   the sharp pipeline behind `npm run images`
   build-engine.mjs      esbuild bundle of the browser script (public/hero.js)
+  build-meta.mjs        robots.txt, sitemap.xml, manifest.webmanifest from site.json
   dev.mjs               `next dev` with the engine rebuilt on change
 src/
-  pages/         _app (fonts, global CSS), _document, index (no runtime JS), menu, about, contact, 404
-  app/           metadata routes only: icon, robots, sitemap, manifest
+  pages/         _app (fonts, global CSS), _document, index, menu, about, contact, 404 — none ship runtime JS
   components/hero/
     Hero.tsx     server-rendered markup with `data-*` hooks; runs at build time only
     client.ts    browser entry: mounts the engine and the menu
@@ -60,7 +61,7 @@ src/
     drinks.ts    the menu — names, copy, colours, ingredient positions
     venue.ts     the café: tagline, address, phone, hours (About and Contact copy)
     sprites.ts   sprite files with their intrinsic sizes
-  lib/site.ts    site name, description, URL, navigation
+  lib/site.ts    site constants (from site.json) + the canonical URL from the environment
 ```
 
 ## Menu
@@ -114,4 +115,8 @@ The opening frame ships only what it shows: one landscape (AVIF, ~66 KB, or a ~3
 
 ## Deployment
 
-The site is fully static (`next build` prerenders every route). Deploy to Vercel with defaults, or run `npm run build && npm run start` behind any Node host. Artwork under `/backgrounds`, `/cups`, `/sprites`, `/sides` and `/brand` is served with a one-year immutable cache; rename a file if you replace it.
+The site is fully static (`next build` prerenders every route, and no route ships framework JavaScript). Deploy to Vercel with defaults, or run `npm run build && npm run start` behind any Node host — set `NEXT_PUBLIC_SITE_URL` in the build environment either way.
+
+Production responses carry a Content-Security-Policy (`script-src 'self'` plus the hash of the menu page's one inline handler), HSTS, `X-Frame-Options`, `Referrer-Policy` and `Permissions-Policy` (see [`next.config.ts`](next.config.ts)). Artwork under `/backgrounds`, `/cups`, `/sprites`, `/sides` and `/brand`, and `/hero.js`, are served with a one-year immutable cache; rename an artwork file if you replace it (the engine is versioned by content hash automatically).
+
+Still to wire up before launch: the `LOGIN` link (`#login` in `site.json`) has no destination yet; `ORDER NOW` points at the contact page (orders by phone).

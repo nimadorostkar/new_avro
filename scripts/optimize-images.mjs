@@ -76,7 +76,10 @@ async function portraitCrops() {
   }
 }
 
-await fs.rm(OUT, { recursive: true, force: true });
+// Only the folders this script owns are rebuilt; public/ also holds the engine, metadata and icon.
+for (const dir of ["backgrounds", "cups", "sprites", "sides", "brand", "og.jpg"]) {
+  await fs.rm(path.join(OUT, dir), { recursive: true, force: true });
+}
 await convert("backgrounds", { avif: AVIF_PHOTO });
 await portraitCrops();
 await convert("cups", { avif: { quality: 60, effort: 6 } });

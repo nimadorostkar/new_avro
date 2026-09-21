@@ -8,8 +8,11 @@ next-env.d.ts
 
 # production
 /build
-# built by scripts/build-engine.mjs
+# built by scripts/build-engine.mjs and scripts/build-meta.mjs
 /public/hero.js
+/public/robots.txt
+/public/sitemap.xml
+/public/manifest.webmanifest
 
 # misc
 .DS_Store

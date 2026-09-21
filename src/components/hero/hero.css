@@ -218,7 +218,7 @@ html:has(.avro) {
 
 /* ---------- interface ---------- */
 .ui { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
-.ui a, .ui button { pointer-events: auto; }
+.ui a, .ui button, .ui .tag { pointer-events: auto; }
 .frame {
   position: absolute; inset: var(--pad-y) var(--pad-x); border: 1px solid rgba(246, 241, 230, 0.22);
   opacity: 0; animation: fade 1.6s 0.2s ease forwards;

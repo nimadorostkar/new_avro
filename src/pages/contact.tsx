@@ -1,6 +1,6 @@
 import type { PageConfig } from "next";
 import { Shell } from "@/components/site/Shell";
-import { VENUE } from "@/data/venue";
+import { MAPS_URL, VENUE } from "@/data/venue";
 
 export const config: PageConfig = { unstable_runtimeJS: false };
 
@@ -21,7 +21,7 @@ export default function ContactPage() {
           <a className="phone" href={`tel:${VENUE.phone.tel}`} dir="ltr">
             {VENUE.phone.display}
           </a>
-          <a className="button" href={VENUE.maps} target="_blank" rel="noopener noreferrer">
+          <a className="button" href={MAPS_URL} target="_blank" rel="noopener noreferrer">
             مسیریابی در نقشه
           </a>
         </section>

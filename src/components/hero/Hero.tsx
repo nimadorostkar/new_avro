@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef } from "react";
-import type { Drink } from "@/data/drinks";
+import { DRINKS, type Drink } from "@/data/drinks";
 import { SITE } from "@/lib/site";
 import { mountHero } from "./engine";
-import { layoutBits, scrollToDrink } from "./scene";
+import { layoutBits, scrollToDrink, sourceData, sourceVars, sources } from "./scene";
 import "./hero.css";
 
 /* falling drops from the leaf tips: [x, y, duration, delay] in artwork pixels / seconds */
@@ -18,10 +17,39 @@ const DROPS = [
 
 const u = (px: number) => `calc(var(--u)*${px})`;
 
-type Props = { drinks: readonly Drink[] };
+/**
+ * Only the opening drink's artwork is in the first paint. Everything else
+ * carries its sources as data attributes and is loaded by the engine when
+ * the drink is one step away (see `warm` in engine.ts).
+ */
+const eager = (i: number) => i === 0;
 
-export function Hero({ drinks }: Props) {
+/** Background-image element: eager ones get CSS variables, lazy ones data attributes. */
+const bgProps = (base: string, i: number) => (eager(i) ? { style: sourceVars(sources(base)) } : sourceData(sources(base)));
+
+type PicProps = {
+  base: string;
+  alt: string;
+  width: number;
+  height: number;
+  lazy?: boolean;
+  fetchPriority?: "high" | "auto";
+};
+
+/** AVIF with a WebP fallback. Lazy pictures hold their sources until the engine sets them. */
+function Pic({ base, alt, width, height, lazy, fetchPriority }: PicProps) {
+  const { avif, webp } = sources(base);
+  return (
+    <picture>
+      <source type="image/avif" {...(lazy ? { "data-srcset": avif } : { srcSet: avif })} />
+      <img {...(lazy ? { "data-src": webp } : { src: webp })} alt={alt} width={width} height={height} decoding="async" fetchPriority={fetchPriority} />
+    </picture>
+  );
+}
+
+export function Hero() {
   const root = useRef<HTMLDivElement>(null);
+  const drinks: readonly Drink[] = DRINKS;
   const first = drinks[0];
 
   useEffect(() => {
@@ -39,13 +67,8 @@ export function Hero({ drinks }: Props) {
             <div className="layer" data-depth=".012">
               <div className="bg">
                 {drinks.map((d, i) => (
-                  <div
-                    key={d.slug}
-                    className={i === 0 ? "bgv on" : "bgv"}
-                    style={{ backgroundImage: `url(${d.bg})` }}
-                    data-bg={i}
-                  >
-                    {d.flash && <div className="flash" style={{ backgroundImage: `url(${d.flash})` }} data-flash />}
+                  <div key={d.slug} className={eager(i) ? "bgv on" : "bgv"} data-bg={i} {...bgProps(d.bg, i)}>
+                    {d.flash && <div className="flash" data-flash {...bgProps(d.flash, i)} />}
                   </div>
                 ))}
               </div>
@@ -67,12 +90,13 @@ export function Hero({ drinks }: Props) {
 
             <div className="layer" data-depth=".05" aria-hidden="true">
               {drinks.map((d, n) => (
-                <div key={d.slug} className={n === 0 ? "set on" : "set"} data-set={n}>
+                <div key={d.slug} className={eager(n) ? "set on" : "set"} data-set={n}>
                   {layoutBits(d, n).map((b) => (
                     <div key={b.key} className="bit" style={b.style}>
                       <i
-                        className={b.flat ? (n === 0 ? "in intro" : "in") : "in ph"}
-                        style={b.innerStyle}
+                        className={b.flat ? (eager(n) ? "in intro" : "in") : "in ph"}
+                        style={eager(n) ? { ...b.innerStyle, ...sourceVars(b.sources) } : b.innerStyle}
+                        {...(eager(n) ? {} : sourceData(b.sources))}
                         data-bit
                       />
                     </div>
@@ -89,19 +113,14 @@ export function Hero({ drinks }: Props) {
                   <div className="cuptilt">
                     <div className="cupfloat">
                       {drinks.map((d, i) => (
-                        <div
-                          key={d.slug}
-                          className={i === 0 ? "cupslot is-active" : "cupslot"}
-                          style={{ "--m": `url(${d.cup})` } as React.CSSProperties}
-                          data-slot={i}
-                        >
-                          <Image
-                            src={d.cup}
+                        <div key={d.slug} className={eager(i) ? "cupslot is-active" : "cupslot"} data-slot={i}>
+                          <Pic
+                            base={d.cup}
                             alt={`AVRO! ${d.name} in a clear cup with a black lid`}
                             width={464}
                             height={640}
-                            sizes="(min-aspect-ratio: 1668/943) 24vw, 42vh"
-                            priority={i === 0}
+                            lazy={!eager(i)}
+                            fetchPriority={eager(i) ? "high" : undefined}
                           />
                           <i className="rim shade1" />
                           <i className="rim warm" />
@@ -136,10 +155,10 @@ export function Hero({ drinks }: Props) {
               {drinks.map(
                 (d, i) =>
                   d.sides && (
-                    <div key={d.slug} className={i === 0 ? "sideset on" : "sideset"} data-sideset={i}>
+                    <div key={d.slug} className={eager(i) ? "sideset on" : "sideset"} data-sideset={i}>
                       {d.sides.map(([src, x, w], k) => (
                         <div key={src} className={k ? "side r" : "side l"} style={{ left: u(x), width: u(w) }} data-side>
-                          <i style={{ backgroundImage: `url(${src})` }} />
+                          <i {...bgProps(src, i)} />
                         </div>
                       ))}
                     </div>
@@ -165,7 +184,7 @@ export function Hero({ drinks }: Props) {
         <div className="frame" />
         <nav className="nav" aria-label="Primary">
           <a className="brand" href="#iced-latte" aria-label="AVRO! home">
-            <Image src="/brand/avro-logo.webp" alt="AVRO!" width={600} height={155} priority />
+            <Pic base="/brand/avro-logo" alt="AVRO!" width={400} height={103} fetchPriority="high" />
           </a>
           <div className="links">
             {SITE.nav.map((l) => (

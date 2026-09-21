@@ -14,7 +14,7 @@ export type Bit = readonly [
   blur?: number,
 ];
 
-/** A foreground plant framing the page edge: `[src, x, width]` in artwork pixels. */
+/** A foreground plant framing the page edge: `[src (no extension), x, width]` in artwork pixels. */
 export type SidePlant = readonly [src: string, x: number, width: number];
 
 export type Drink = {
@@ -26,6 +26,7 @@ export type Drink = {
   /** Two callout labels pinned to the cup. */
   tags: readonly [string, string];
   note: string;
+  /** Image paths without extension; served as AVIF with a WebP fallback. */
   cup: string;
   bg: string;
   /** Optional splash photo shown inside the iris before the landscape resolves. */
@@ -47,8 +48,8 @@ export type Drink = {
 
 /** Foreground plantation leaves. Assign to a drink's `sides` to frame it. */
 export const PLANTATION_SIDES = [
-  ["/sides/plant-left.webp", 0, 549],
-  ["/sides/plant-right.webp", 1259, 409],
+  ["/sides/plant-left", 0, 549],
+  ["/sides/plant-right", 1259, 409],
 ] as const satisfies readonly [SidePlant, SidePlant];
 
 /* ---- the menu: edit names / copy here ---- */
@@ -59,8 +60,8 @@ export const DRINKS: readonly Drink[] = [
     word: "Sunrise",
     tags: ["COLD-BREWED 18H", "HAND-PICKED"],
     note: "Mountain-grown coffee, shaken cold for slow mornings and long afternoons",
-    cup: "/cups/iced-latte.webp",
-    bg: "/backgrounds/iced-latte.jpg",
+    cup: "/cups/iced-latte",
+    bg: "/backgrounds/iced-latte",
     color: "#f0d29a",
     sun: "rgba(255,214,140,.6)",
     mote: [255, 224, 160],
@@ -81,9 +82,9 @@ export const DRINKS: readonly Drink[] = [
     word: "Horizon",
     tags: ["WILD BLUEBERRY", "RIPE MANGO"],
     note: "Blueberry over cold milk, resting on a layer of ripe mango",
-    cup: "/cups/blue-mango.webp",
-    bg: "/backgrounds/blue-mango.jpg",
-    flash: "/backgrounds/berry-splash.jpg",
+    cup: "/cups/blue-mango",
+    bg: "/backgrounds/blue-mango",
+    flash: "/backgrounds/berry-splash",
     color: "#8d8ff0",
     sun: "rgba(255,196,120,.6)",
     mote: [200, 210, 255],
@@ -109,8 +110,8 @@ export const DRINKS: readonly Drink[] = [
     word: "Garden",
     tags: ["STONE-GROUND MATCHA", "RIPE MANGO"],
     note: "Whisked matcha and cold milk poured slowly over ripe mango",
-    cup: "/cups/matcha-mango.webp",
-    bg: "/backgrounds/matcha-mango.jpg",
+    cup: "/cups/matcha-mango",
+    bg: "/backgrounds/matcha-mango",
     color: "#b5d86a",
     sun: "rgba(225,255,150,.55)",
     mote: [190, 232, 110],
@@ -136,9 +137,9 @@ export const DRINKS: readonly Drink[] = [
     word: "Sky",
     tags: ["WILD BLUEBERRY", "FRESH MILK"],
     note: "Blueberry and cold fresh milk. Blue by nature, nothing added",
-    cup: "/cups/blue-latte.webp",
-    bg: "/backgrounds/blue-latte.jpg",
-    flash: "/backgrounds/berry-splash.jpg",
+    cup: "/cups/blue-latte",
+    bg: "/backgrounds/blue-latte",
+    flash: "/backgrounds/berry-splash",
     color: "#9aa8ff",
     sun: "rgba(190,215,255,.65)",
     mote: [225, 232, 255],

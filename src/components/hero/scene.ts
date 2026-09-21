@@ -22,6 +22,20 @@ export const scrollToDrink = (index: number) =>
 
 const u = (px: number) => `calc(var(--u)*${px})`;
 
+/** The two encodings every image is served in (see scripts/optimize-images.mjs). */
+export type Sources = { avif: string; webp: string };
+export const sources = (base: string): Sources => ({ avif: `${base}.avif`, webp: `${base}.webp` });
+
+/**
+ * Inline style that hands both encodings to the stylesheet, which picks one
+ * with `image-set()` where supported and falls back to WebP elsewhere.
+ */
+export const sourceVars = ({ avif, webp }: Sources) =>
+  ({ "--avif": `url("${avif}")`, "--webp": `url("${webp}")` }) as React.CSSProperties;
+
+/** The same pair as data attributes, for elements that load on demand. */
+export const sourceData = ({ avif, webp }: Sources) => ({ "data-avif": avif, "data-webp": webp });
+
 export type BitGeometry = {
   /** Vector from the bit back to the cup (artwork px): where it is thrown from. */
   dx: number;
@@ -35,12 +49,12 @@ export type BitGeometry = {
 
 export type BitLayout = {
   key: string;
-  src: string;
+  sources: Sources;
   /** Depth-of-field sprites get a blur + drop shadow; flat ones are drawn as-is. */
   flat: boolean;
   /** Inline style for the `.bit` wrapper (position, size and the drift/burst CSS variables). */
   style: React.CSSProperties;
-  /** Inline style for the sprite itself. */
+  /** Inline style for the sprite itself (rotation and blur). */
   innerStyle: React.CSSProperties;
   geometry: BitGeometry;
 };
@@ -71,14 +85,11 @@ export function layoutBits(drink: Drink, drinkIndex: number): BitLayout[] {
       "--t": `${6 + ((i * 1.3) % 4)}s`,
     } as React.CSSProperties;
 
-    const innerStyle = {
-      backgroundImage: `url(${sprite.src})`,
-      ...(flat ? {} : { "--b": `${blur}px`, "--r": `${rot}deg` }),
-    } as React.CSSProperties;
+    const innerStyle = (flat ? {} : { "--b": `${blur}px`, "--r": `${rot}deg` }) as React.CSSProperties;
 
     return {
       key: `${key}-${i}`,
-      src: sprite.src,
+      sources: sources(sprite.src),
       flat,
       style,
       innerStyle,

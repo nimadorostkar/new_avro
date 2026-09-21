@@ -28,13 +28,13 @@ export const metadata: Metadata = {
     title: SITE.title,
     description: SITE.description,
     locale: "en_US",
-    images: [{ url: "/backgrounds/iced-latte.jpg", width: 1668, height: 943, alt: "A cup of AVRO! Iced Latte at sunrise" }],
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "A cup of AVRO! Iced Latte at sunrise" }],
   },
   twitter: {
     card: "summary_large_image",
     title: SITE.title,
     description: SITE.description,
-    images: ["/backgrounds/iced-latte.jpg"],
+    images: ["/og.jpg"],
   },
   robots: { index: true, follow: true },
 };

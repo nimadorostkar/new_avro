@@ -1,6 +1,6 @@
 import type { Drink } from "@/data/drinks";
 import { SPRITES, type SpriteKey } from "@/data/sprites";
-import { CUP_CENTER, SCENE, layoutBits, prefersReducedMotion, stepHeight, unit, type BitGeometry } from "./scene";
+import { CUP_CENTER, SCENE, layoutBits, prefersReducedMotion, sources, stepHeight, unit, type BitGeometry } from "./scene";
 
 /*
  * The hero is rendered once by React (see Hero.tsx) and then driven here with
@@ -9,6 +9,28 @@ import { CUP_CENTER, SCENE, layoutBits, prefersReducedMotion, stepHeight, unit, 
  * `mountHero` returns a disposer that cancels every animation, timer and
  * listener, so it is safe under React Strict Mode and route changes.
  */
+
+/** A 1x1 AVIF; decoding it tells us which encoding the canvas sprites should use. */
+const AVIF_PROBE =
+  "data:image/avif;base64,AAAAHGZ0eXBhdmlmAAAAAG1pZjFhdmlmbWlhZgAAANZtZXRhAAAAAAAAACFoZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAAAAAACJpbG9jAAAAAERAAAEAAQAAAAAA+gABAAAAAAAAAB4AAAAjaWluZgAAAAAAAQAAABVpbmZlAgAAAAABAABhdjAxAAAAAA5waXRtAAAAAAABAAAAVmlwcnAAAAA4aXBjbwAAAAxhdjFDgSACAAAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAABZpcG1hAAAAAAAAAAEAAQOBAgMAAAAmbWRhdBIACgc4AAbQENBpMhEcQmLk4AAWAAAAkDWOPH6IUA==";
+let avifSupport: Promise<boolean> | undefined;
+const supportsAvif = () =>
+  (avifSupport ??= new Promise((resolve) => {
+    const probe = new Image();
+    probe.onload = () => resolve(probe.width > 0);
+    probe.onerror = () => resolve(false);
+    probe.src = AVIF_PROBE;
+  }));
+
+/** Move an element's deferred sources into the CSS variables the stylesheet reads. */
+const applySources = (el: HTMLElement) => {
+  const { avif, webp } = el.dataset;
+  if (!avif || !webp) return;
+  el.style.setProperty("--avif", `url("${avif}")`);
+  el.style.setProperty("--webp", `url("${webp}")`);
+  delete el.dataset.avif;
+  delete el.dataset.webp;
+};
 
 const OUT = "cubic-bezier(.6,0,.9,.3)";
 const IN = "cubic-bezier(.17,1.22,.3,1)";
@@ -77,6 +99,49 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
     disposers.push(() => window.removeEventListener(type, fn, opts));
   };
 
+  /* ---- artwork loads one drink at a time ---- */
+  const IMG: Partial<Record<SpriteKey, HTMLImageElement>> = {};
+  const warmed = new Set<number>();
+  const warm = (n: number) => {
+    const d = drinks[n];
+    if (!d || warmed.has(n)) return;
+    warmed.add(n);
+    const slot = slots[n]!;
+    applySources(bgs[n]!);
+    const flash = flashes[n];
+    if (flash) applySources(flash);
+    sets[n]!.items.forEach((b) => applySources(b.inner));
+    sides[n]?.els.forEach((s) => applySources(q(s, "i")));
+    slot.querySelectorAll<HTMLSourceElement>("source[data-srcset]").forEach((src) => {
+      src.srcset = src.dataset.srcset!;
+      delete src.dataset.srcset;
+    });
+    const img = q<HTMLImageElement>(slot, "img");
+    if (img.dataset.src) {
+      img.src = img.dataset.src;
+      delete img.dataset.src;
+    }
+    // Relight the cup through its own alpha: the mask is whichever encoding the browser chose.
+    const lit = () => {
+      if (!img.currentSrc) return;
+      slot.style.setProperty("--m", `url("${img.currentSrc}")`);
+      slot.classList.add("lit");
+    };
+    if (img.complete && img.naturalWidth) lit();
+    else img.addEventListener("load", lit, { once: true });
+    // Canvas sprites for the air share the browser's image cache with the CSS ones.
+    if (d.fall) {
+      void supportsAvif().then((ok) => {
+        for (const k of d.fall!) {
+          if (IMG[k]) continue;
+          const i = new Image();
+          i.src = sources(SPRITES[k].src)[ok ? "avif" : "webp"];
+          IMG[k] = i;
+        }
+      });
+    }
+  };
+
   /* ---- text pieces ---- */
   const setWord = (txt: string, cls: string) => {
     word.replaceChildren();
@@ -111,6 +176,7 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
     const from = slots[prev]!;
     const to = slots[n]!;
     const D = drinks[n]!;
+    warm(n);
     timers.forEach(clearTimeout);
     timers = [];
     live.forEach((a) => a.cancel());
@@ -322,11 +388,31 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
     later(() => setTags(D), 420);
     later(() => calls[0]?.classList.add("on"), 1250);
     later(() => calls[1]?.classList.add("on"), 1500);
+    later(() => {
+      warm(n + dir);
+      warm(n - dir);
+    }, 1800);
   }
 
   /* ---- first paint: callouts draw themselves once the cup has risen ---- */
+  warm(0);
   later(() => calls[0]?.classList.add("on"), reduce ? 0 : 3500);
   later(() => calls[1]?.classList.add("on"), reduce ? 0 : 4100);
+  // Fetch the next drink once the opening frame has everything it needs.
+  const whenIdle = (fn: () => void) => {
+    const run = () => {
+      if ("requestIdleCallback" in window) {
+        const id = window.requestIdleCallback(fn, { timeout: 3000 });
+        disposers.push(() => window.cancelIdleCallback(id));
+      } else later(fn, 1500);
+    };
+    if (document.readyState === "complete") run();
+    else {
+      window.addEventListener("load", run, { once: true });
+      disposers.push(() => window.removeEventListener("load", run));
+    }
+  };
+  whenIdle(() => warm(cur + 1));
 
   /* ---- scroll position -> drink ---- */
   let raf = 0;
@@ -371,15 +457,10 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
   /* ---- air ---- */
   const g = canvas.getContext("2d");
   if (!g) return dispose;
-  const IMG = {} as Record<SpriteKey, HTMLImageElement>;
-  for (const k of Object.keys(SPRITES) as SpriteKey[]) {
-    IMG[k] = new Image();
-    IMG[k].src = SPRITES[k].src;
-  }
   type Mote = { x: number; y: number; r: number; vx: number; vy: number; p: number };
   type Leaf = {
     x: number; y: number; s: number; vy: number; sw: number; a: number; va: number; f: number; vf: number;
-    c: string; o: number; img: HTMLImageElement | null;
+    c: string; o: number; img: SpriteKey | null;
   };
   type Spark = Leaf & { vx: number; life: number };
   let W = 0;
@@ -400,7 +481,7 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
     x: Math.random() * W, y: top ? -20 : Math.random() * H, s: (Math.random() * 9 + 5) * dp,
     vy: (Math.random() * 0.7 + 0.35) * dp, sw: Math.random() * TAU, a: Math.random() * TAU, va: (Math.random() - 0.5) * 0.04,
     f: Math.random() * TAU, vf: Math.random() * 0.05 + 0.02, c: pick(air.petals ?? []) ?? "#fff", o: Math.random() * 0.5 + 0.45,
-    img: air.fall ? IMG[pick(air.fall)!] : null,
+    img: air.fall ? pick(air.fall)! : null,
   });
   const fill = () => {
     motes = Array.from({ length: air.motes }, mkMote);
@@ -435,21 +516,38 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
         sparks.push({
           x: ox, y: oy, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp - 3 * dp, s: (Math.random() * 8 + 4) * dp,
           a: an, va: (Math.random() - 0.5) * 0.3, f: 0, vf: Math.random() * 0.2 + 0.1, c: cols[i % cols.length]!, life: 1,
-          sw: 0, o: 1, img: D.fall ? IMG[D.fall[i % D.fall.length]!] : null,
+          sw: 0, o: 1, img: D.fall ? D.fall[i % D.fall.length]! : null,
         });
       }
     }, 700);
   };
+  const moteSprites = new Map<string, HTMLCanvasElement>();
+  const moteSprite = ([r, gg, b]: readonly [number, number, number]) => {
+    const key = `${r},${gg},${b}`;
+    let c = moteSprites.get(key);
+    if (c) return c;
+    c = document.createElement("canvas");
+    c.width = c.height = 64;
+    const cg = c.getContext("2d")!;
+    const gr = cg.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, `rgba(${key},1)`);
+    gr.addColorStop(1, `rgba(${key},0)`);
+    cg.fillStyle = gr;
+    cg.fillRect(0, 0, 64, 64);
+    moteSprites.set(key, c);
+    return c;
+  };
   const leafy = (p: Leaf, alpha: number) => {
     if (p.img) {
-      if (!p.img.complete || !p.img.naturalWidth) return;
+      const img = IMG[p.img];
+      if (!img?.complete || !img.naturalWidth) return;
       const w = p.s * 2.2;
-      const h = (w * p.img.height) / p.img.width;
+      const h = (w * img.height) / img.width;
       g.save();
       g.translate(p.x, p.y);
       g.rotate(p.a);
       g.globalAlpha = Math.min(1, alpha * 1.4);
-      g.drawImage(p.img, -w / 2, -h / 2, w, h);
+      g.drawImage(img, -w / 2, -h / 2, w, h);
       g.restore();
       return;
     }
@@ -483,24 +581,22 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
     g.clearRect(0, 0, W, H);
     airK += (airTarget - airK) * 0.08;
     const k = Math.min(1, (now - t0) / 4000) * airK;
-    const [mr, mg, mb] = air.mote;
-    for (const m of motes) {
-      m.x += m.vx;
-      m.y += m.vy;
-      m.p += 0.012;
-      if (m.y < -10) {
-        m.y = H + 10;
-        m.x = Math.random() * W;
+    if (motes.length) {
+      const sprite = moteSprite(air.mote);
+      for (const m of motes) {
+        m.x += m.vx;
+        m.y += m.vy;
+        m.p += 0.012;
+        if (m.y < -10) {
+          m.y = H + 10;
+          m.x = Math.random() * W;
+        }
+        if (m.x > W + 10) m.x = -10;
+        g.globalAlpha = (0.25 + 0.25 * Math.sin(m.p)) * k;
+        const r = m.r * 3;
+        g.drawImage(sprite, m.x - r, m.y - r, r * 2, r * 2);
       }
-      if (m.x > W + 10) m.x = -10;
-      const a = (0.25 + 0.25 * Math.sin(m.p)) * k;
-      const gr = g.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 3);
-      gr.addColorStop(0, `rgba(${mr},${mg},${mb},${a})`);
-      gr.addColorStop(1, `rgba(${mr},${mg},${mb},0)`);
-      g.fillStyle = gr;
-      g.beginPath();
-      g.arc(m.x, m.y, m.r * 3, 0, TAU);
-      g.fill();
+      g.globalAlpha = 1;
     }
     for (const p of petals) {
       p.sw += 0.015;

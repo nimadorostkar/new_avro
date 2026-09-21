@@ -5,10 +5,8 @@ const ONE_YEAR = 60 * 60 * 24 * 365;
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  images: {
-    formats: ["image/avif", "image/webp"],
-    minimumCacheTTL: ONE_YEAR,
-  },
+  // Artwork is pre-encoded by scripts/optimize-images.mjs, so the runtime optimizer is not used.
+  images: { unoptimized: true },
   async headers() {
     return [
       {

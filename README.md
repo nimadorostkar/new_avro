@@ -45,7 +45,7 @@ scripts/
   build-engine.mjs      esbuild bundle of the browser script (public/hero.js)
   dev.mjs               `next dev` with the engine rebuilt on change
 src/
-  pages/         _app (fonts, global CSS), _document, index (no runtime JS), about, contact, 404
+  pages/         _app (fonts, global CSS), _document, index (no runtime JS), menu, about, contact, 404
   app/           metadata routes only: icon, robots, sitemap, manifest
   components/hero/
     Hero.tsx     server-rendered markup with `data-*` hooks; runs at build time only
@@ -62,6 +62,10 @@ src/
     sprites.ts   sprite files with their intrinsic sizes
   lib/site.ts    site name, description, URL, navigation
 ```
+
+## Menu
+
+`/menu` lists every drink in [`src/data/drinks.ts`](src/data/drinks.ts) as a hairline grid of cards (number, cup, "Taste the …" in the drink's accent colour, name, note, tags). Each card links to that drink's step on the home page. Cups beyond the first row load lazily, so adding drinks costs nothing on first paint; on phones the cards collapse to rows.
 
 ## About and Contact
 

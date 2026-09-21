@@ -7,7 +7,9 @@ type Props = {
   /** Page title (shown in the tab) and description (meta + social). */
   title: string;
   description: string;
-  path: "/about" | "/contact";
+  path: "/about" | "/contact" | "/menu";
+  /** Persian pages read right-to-left; English ones follow the landing page. */
+  lang?: "fa" | "en";
   children: React.ReactNode;
 };
 
@@ -16,8 +18,9 @@ type Props = {
  * glow and corner brackets as the hero, with a nav that simply wraps on small
  * screens (there is no script to open a menu here, and none is needed).
  */
-export function Shell({ title, description, path, children }: Props) {
+export function Shell({ title, description, path, lang = "fa", children }: Props) {
   const url = `${SITE.url}${path}`;
+  const dir = lang === "fa" ? "rtl" : "ltr";
   return (
     <div className={`page ${vazirmatn.variable}`}>
       <Head>
@@ -55,10 +58,10 @@ export function Shell({ title, description, path, children }: Props) {
           </a>
         </nav>
       </header>
-      <main className="page-main" dir="rtl" lang="fa">
+      <main className="page-main" dir={dir} lang={lang}>
         {children}
       </main>
-      <footer className="page-foot" dir="rtl" lang="fa">
+      <footer className="page-foot" dir={dir} lang={lang}>
         <span dir="ltr">{SITE.name}</span>
         <span>{VENUE_CITY}</span>
       </footer>

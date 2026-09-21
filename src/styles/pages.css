@@ -131,3 +131,60 @@
 @media (prefers-reduced-motion: reduce) {
   .page *, .page *::before { animation-duration: 0.01s !important; animation-delay: 0s !important; }
 }
+
+/* ---------- menu: one hairline grid of drinks, each card a small stage for its cup ---------- */
+.page-main[lang="en"] { font-family: var(--sans); }
+.page-main[lang="en"] .eyebrow { font: 600 clamp(11px, 0.92vw, 14px) / 1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.page-main[lang="en"] .statement { font: 400 clamp(44px, 7vw, 120px) / 0.9 var(--sans); letter-spacing: -0.035em; text-transform: uppercase; max-width: none; }
+.page-main[lang="en"] .lede { font: 400 clamp(15px, 1.25vw, 19px) / 1.7 var(--sans); max-width: 52ch; }
+.eyebrow-count { color: rgba(246, 241, 230, 0.55); }
+.eyebrow-count::before { content: "— "; }
+
+/* hairlines are drawn by the cards (overlapping in the 1px gap), so an incomplete last row leaves the night bare */
+.menu-grid {
+  list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 1px;
+  margin-top: clamp(32px, 7vh, 72px); padding: 1px;
+  animation: reveal-up 0.9s 0.45s var(--ease) both;
+}
+.drink {
+  position: relative; isolation: isolate; overflow: hidden; height: 100%;
+  display: grid; grid-template-rows: auto 1fr auto; gap: clamp(16px, 2vh, 24px);
+  padding: clamp(20px, 2.4vw, 32px); background: var(--night); box-shadow: 0 0 0 1px rgba(246, 241, 230, 0.18);
+}
+/* the drink's own sunrise, held back until hover */
+.drink::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(70% 55% at 50% 38%, var(--glow), transparent 72%);
+  opacity: 0; transition: opacity 0.7s var(--ease);
+}
+.drink:hover::before, .drink:focus-visible::before { opacity: 0.6; }
+.drink-top { display: flex; justify-content: space-between; align-items: baseline; font: 600 clamp(10px, 0.82vw, 12px) / 1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.drink-num { color: var(--crema); }
+.drink-cta { opacity: 0; transform: translateX(6px); transition: opacity 0.4s, transform 0.5s var(--ease); }
+.drink-cta::after { content: " \2197"; }
+.drink:hover .drink-cta, .drink:focus-visible .drink-cta { opacity: 1; transform: none; }
+.drink-cup {
+  display: block; width: min(56%, 200px); margin: 0 auto; align-self: center;
+  filter: drop-shadow(0 22px 26px rgba(0, 0, 0, 0.5));
+  transform: rotate(7deg); transition: transform 0.8s var(--ease);
+}
+.drink:hover .drink-cup, .drink:focus-visible .drink-cup { transform: rotate(0) translateY(-10px) scale(1.04); }
+.drink-cup img { display: block; width: 100%; height: auto; filter: contrast(1.06) saturate(1.14) brightness(0.97); }
+.drink-body { display: grid; gap: 10px; }
+.drink-word { font: 600 clamp(10px, 0.82vw, 12px) / 1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.drink-name { font: 400 clamp(26px, 2.4vw, 38px) / 0.95 var(--sans); letter-spacing: -0.025em; text-transform: uppercase; }
+.drink-note { font: 400 clamp(13px, 1vw, 15px) / 1.6 var(--sans); color: rgba(246, 241, 230, 0.72); }
+.drink-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.drink-tags span { font: 600 10px / 1 var(--mono); letter-spacing: 0.06em; padding: 7px 9px; border: 1px solid rgba(246, 241, 230, 0.25); transition: border-color 0.3s, color 0.3s; }
+.drink:hover .drink-tags span { border-color: var(--accent); color: var(--accent); }
+
+/* phones: the cup moves beside the copy so the list stays scannable at fifty items */
+@media (max-width: 560px) {
+  .drink { grid-template-columns: 34% 1fr; grid-template-rows: auto auto; gap: 14px 18px; padding: 18px 16px; }
+  .drink-top { grid-column: 1 / -1; }
+  .drink-cup { width: 100%; align-self: start; transform: rotate(5deg); }
+  .drink-body { align-self: center; }
+}
+@media (hover: none) {
+  .drink-cta { opacity: 0.6; transform: none; }
+}

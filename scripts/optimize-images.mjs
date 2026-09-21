@@ -1,7 +1,7 @@
 /**
  * Builds the served image set in public/ from the originals in assets/.
  *
- *   assets/backgrounds/*.jpg   -> public/backgrounds/*.{avif,webp}
+ *   assets/backgrounds/*.jpg   -> public/backgrounds/*.{avif,webp} (+ *-p: 750x943 centre crop for tall screens)
  *   assets/cups/*.webp         -> public/cups/*.{avif,webp}
  *   assets/sprites/*.webp      -> public/sprites/*.{avif,webp}
  *   assets/sides/*.webp        -> public/sides/*.{avif,webp}
@@ -61,8 +61,24 @@ async function copyWebp(src, file) {
   return size;
 }
 
+/** Centre crop of each full landscape for portrait screens, which only see the middle of it. */
+async function portraitCrops() {
+  const dir = path.join(SRC, "backgrounds");
+  for (const f of (await fs.readdir(dir)).filter((f) => /\.jpe?g$/i.test(f)).sort()) {
+    const src = path.join(dir, f);
+    const { width, height } = await sharp(src).metadata();
+    if (width !== 1668 || height !== 943) continue; // the flash is not a landscape
+    const base = `backgrounds/${f.replace(/\.[^.]+$/, "")}-p`;
+    const crop = () => sharp(src).extract({ left: (1668 - 750) / 2, top: 0, width: 750, height: 943 });
+    const a = await emit(`${base}.avif`, crop().avif(AVIF_PHOTO));
+    const w = await emit(`${base}.webp`, crop().webp(WEBP));
+    console.log(`${base.padEnd(32)} ${"".padStart(9)} -> avif ${kb(a).padStart(8)}  webp ${kb(w).padStart(8)}`);
+  }
+}
+
 await fs.rm(OUT, { recursive: true, force: true });
 await convert("backgrounds", { avif: AVIF_PHOTO });
+await portraitCrops();
 await convert("cups", { avif: { quality: 60, effort: 6 } });
 await convert("sprites");
 await convert("sides");

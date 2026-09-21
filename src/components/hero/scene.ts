@@ -45,12 +45,21 @@ export const sources = (base: string): Sources => ({ avif: `${base}.avif`, webp:
 /**
  * Inline style that hands both encodings to the stylesheet, which picks one
  * with `image-set()` where supported and falls back to WebP elsewhere.
+ * `portrait` is the centre crop that phones get instead of the full landscape.
  */
-export const sourceVars = ({ avif, webp }: Sources) =>
-  ({ "--avif": `url("${avif}")`, "--webp": `url("${webp}")` }) as React.CSSProperties;
+export const sourceVars = ({ avif, webp }: Sources, portrait?: Sources) =>
+  ({
+    "--avif": `url("${avif}")`,
+    "--webp": `url("${webp}")`,
+    ...(portrait ? { "--avif-p": `url("${portrait.avif}")`, "--webp-p": `url("${portrait.webp}")` } : {}),
+  }) as React.CSSProperties;
 
-/** The same pair as data attributes, for elements that load on demand. */
-export const sourceData = ({ avif, webp }: Sources) => ({ "data-avif": avif, "data-webp": webp });
+/** The same pairs as data attributes, for elements that load on demand. */
+export const sourceData = ({ avif, webp }: Sources, portrait?: Sources) => ({
+  "data-avif": avif,
+  "data-webp": webp,
+  ...(portrait ? { "data-avif-p": portrait.avif, "data-webp-p": portrait.webp } : {}),
+});
 
 export type BitGeometry = {
   /** Vector from the bit back to the cup (artwork px): where it is thrown from. */

@@ -1,12 +1,6 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-import { DRINKS, type Drink } from "@/data/drinks";
+import type { Drink } from "@/data/drinks";
 import { SITE } from "@/lib/site";
-import { mountHero } from "./engine";
-import { Menu } from "./Menu";
-import { layoutBits, scrollToDrink, sourceData, sourceVars, sources } from "./scene";
-import "./hero.css";
+import { layoutBits, sourceData, sourceVars, sources } from "./scene";
 
 /* falling drops from the leaf tips: [x, y, duration, delay] in artwork pixels / seconds */
 const DROPS = [
@@ -26,7 +20,11 @@ const u = (px: number) => `calc(var(--u)*${px})`;
 const eager = (i: number) => i === 0;
 
 /** Background-image element: eager ones get CSS variables, lazy ones data attributes. */
-const bgProps = (base: string, i: number) => (eager(i) ? { style: sourceVars(sources(base)) } : sourceData(sources(base)));
+const bgProps = (base: string, i: number, portrait = false) => {
+  const full = sources(base);
+  const crop = portrait ? sources(`${base}-p`) : undefined;
+  return eager(i) ? { style: sourceVars(full, crop) } : sourceData(full, crop);
+};
 
 type PicProps = {
   base: string;
@@ -48,27 +46,24 @@ function Pic({ base, alt, width, height, lazy, fetchPriority }: PicProps) {
   );
 }
 
-export function Hero() {
-  const root = useRef<HTMLDivElement>(null);
-  const drinks: readonly Drink[] = DRINKS;
+/**
+ * Server-rendered markup only. Every element the engine drives carries a
+ * `data-*` hook; the engine (client.ts, built to public/hero.js) finds them
+ * and takes over once the script loads. Nothing here runs in the browser.
+ */
+export function Hero({ drinks }: { drinks: readonly Drink[] }) {
   const first = drinks[0];
-
-  useEffect(() => {
-    if (!root.current) return;
-    return mountHero(root.current, drinks);
-  }, [drinks]);
-
   if (!first) return null;
 
   return (
-    <div className="avro" ref={root}>
+    <div className="avro">
       <div className="hero">
         <div className="scene">
           <div className="cam" data-cam>
             <div className="layer" data-depth=".012">
               <div className="bg">
                 {drinks.map((d, i) => (
-                  <div key={d.slug} className={eager(i) ? "bgv on" : "bgv"} data-bg={i} {...bgProps(d.bg, i)}>
+                  <div key={d.slug} className={eager(i) ? "bgv on" : "bgv"} data-bg={i} {...bgProps(d.bg, i, true)}>
                     {d.flash && <div className="flash" data-flash {...bgProps(d.flash, i)} />}
                   </div>
                 ))}
@@ -200,7 +195,11 @@ export function Hero() {
             <a className="shop" href={SITE.shop.href}>
               {SITE.shop.label}
             </a>
-            <Menu drinks={drinks} />
+            <button type="button" className="burger" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu" data-menu-open>
+              <span />
+              <span />
+              <span />
+            </button>
           </div>
         </nav>
 
@@ -244,8 +243,7 @@ export function Hero() {
               type="button"
               aria-label={d.name}
               aria-current={i === 0 ? "true" : "false"}
-              onClick={() => scrollToDrink(i)}
-              data-rail-item
+              data-rail-item={i}
             >
               <span className="num">0{i + 1}</span>
               <span className="nm">{d.name}</span>
@@ -254,6 +252,30 @@ export function Hero() {
           ))}
           <i className="cue" />
         </div>
+      </div>
+
+      <div id="site-menu" className="menu" role="dialog" aria-modal="true" aria-label="Menu" hidden data-menu>
+        <button type="button" className="menu-close" aria-label="Close menu" data-menu-close>
+          <span />
+          <span />
+        </button>
+        <nav className="menu-links" aria-label="Primary">
+          {[...SITE.nav, SITE.shop].map((l, i) => (
+            <a key={l.href} href={l.href} style={{ "--i": i } as React.CSSProperties}>
+              {l.label}
+            </a>
+          ))}
+        </nav>
+        <ul className="menu-drinks" aria-label="Drinks">
+          {drinks.map((d, i) => (
+            <li key={d.slug}>
+              <button type="button" data-rail-item={i}>
+                <span className="num">0{i + 1}</span>
+                {d.name}
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

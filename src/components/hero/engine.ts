@@ -1,6 +1,6 @@
 import type { Drink } from "@/data/drinks";
 import { SPRITES, type SpriteKey } from "@/data/sprites";
-import { CUP_CENTER, SCENE, compaction, layoutBits, prefersReducedMotion, sources, stepHeight, unit, type BitGeometry } from "./scene";
+import { CUP_CENTER, SCENE, compaction, layoutBits, prefersReducedMotion, scrollToDrink, sources, stepHeight, unit, type BitGeometry } from "./scene";
 
 /*
  * The hero is rendered once by React (see Hero.tsx) and then driven here with
@@ -23,13 +23,14 @@ const supportsAvif = () =>
   }));
 
 /** Move an element's deferred sources into the CSS variables the stylesheet reads. */
+const SOURCE_VARS = { avif: "--avif", webp: "--webp", avifP: "--avif-p", webpP: "--webp-p" } as const;
 const applySources = (el: HTMLElement) => {
-  const { avif, webp } = el.dataset;
-  if (!avif || !webp) return;
-  el.style.setProperty("--avif", `url("${avif}")`);
-  el.style.setProperty("--webp", `url("${webp}")`);
-  delete el.dataset.avif;
-  delete el.dataset.webp;
+  for (const [key, name] of Object.entries(SOURCE_VARS)) {
+    const v = el.dataset[key];
+    if (!v) continue;
+    el.style.setProperty(name, `url("${v}")`);
+    delete el.dataset[key];
+  }
 };
 
 const OUT = "cubic-bezier(.6,0,.9,.3)";
@@ -416,6 +417,13 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
     }
   };
   whenIdle(() => warm(cur + 1));
+
+  /* ---- rail + menu shortcuts -> drink ---- */
+  qa<HTMLButtonElement>(root, "[data-rail-item]").forEach((b) => {
+    const onClick = () => scrollToDrink(Number(b.dataset.railItem));
+    b.addEventListener("click", onClick);
+    disposers.push(() => b.removeEventListener("click", onClick));
+  });
 
   /* ---- scroll position -> drink ---- */
   let raf = 0;

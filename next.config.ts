@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
         headers: [{ key: "Cache-Control", value: `public, max-age=${ONE_YEAR}, immutable` }],
       },
       {
+        // The engine is content-hashed through its query string (see pages/index.tsx).
+        source: "/hero.js",
+        headers: [{ key: "Cache-Control", value: `public, max-age=${ONE_YEAR}, immutable` }],
+      },
+      {
         source: "/(.*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },

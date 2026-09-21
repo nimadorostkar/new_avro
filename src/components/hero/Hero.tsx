@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { preload } from "react-dom";
 import { useEffect, useRef } from "react";
 import type { Drink } from "@/data/drinks";
+import { SITE } from "@/lib/site";
 import { mountHero } from "./engine";
 import { layoutBits, scrollToDrink } from "./scene";
 import "./hero.css";
@@ -23,11 +23,6 @@ type Props = { drinks: readonly Drink[] };
 export function Hero({ drinks }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const first = drinks[0];
-
-  // The opening frame needs the first landscape and cup before anything else.
-  if (first) {
-    preload(first.bg, { as: "image", fetchPriority: "high" });
-  }
 
   useEffect(() => {
     if (!root.current) return;
@@ -107,7 +102,6 @@ export function Hero({ drinks }: Props) {
                             height={640}
                             sizes="(max-width: 820px) 60vw, 25vw"
                             priority={i === 0}
-                            loading="eager"
                           />
                           <i className="rim shade1" />
                           <i className="rim warm" />
@@ -174,14 +168,15 @@ export function Hero({ drinks }: Props) {
             <Image src="/brand/avro-logo.webp" alt="AVRO!" width={600} height={155} priority />
           </a>
           <div className="links">
-            <a href="#beans">BEANS</a>
-            <a href="#ritual">THE RITUAL</a>
-            <a href="#origins">ORIGINS</a>
-            <a href="#sustainability">SUSTAINABILITY</a>
+            {SITE.nav.map((l) => (
+              <a key={l.href} href={l.href}>
+                {l.label}
+              </a>
+            ))}
           </div>
           <div className="right">
-            <a className="shop" href="#shop">
-              SHOP NOW
+            <a className="shop" href={SITE.shop.href}>
+              {SITE.shop.label}
             </a>
             <button type="button" className="burger" aria-label="Open menu">
               <span />

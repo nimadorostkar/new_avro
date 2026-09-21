@@ -15,7 +15,7 @@ export const prefersReducedMotion = () =>
 
 /** Height of one scroll step (a full viewport), read from the DOM so it matches `100svh`. */
 export const stepHeight = () =>
-  document.querySelector<HTMLElement>("[data-step]")?.offsetHeight ?? window.innerHeight;
+  document.querySelector<HTMLElement>("[data-step]")?.offsetHeight || window.innerHeight;
 
 /**
  * How the stylesheet has reshaped the composition for this viewport (portrait

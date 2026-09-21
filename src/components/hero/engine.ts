@@ -429,7 +429,8 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
   let raf = 0;
   const sync = () => {
     raf = 0;
-    go(Math.max(0, Math.min(drinks.length - 1, Math.round(window.scrollY / stepHeight()))));
+    const n = Math.round(window.scrollY / stepHeight());
+    if (Number.isFinite(n)) go(Math.max(0, Math.min(drinks.length - 1, n)));
   };
   on("scroll", () => (raf = raf || requestAnimationFrame(sync)), { passive: true });
   sync();
@@ -498,15 +499,19 @@ export function mountHero(root: HTMLElement, drinks: readonly Drink[]): () => vo
     motes = Array.from({ length: air.motes }, mkMote);
     petals = air.petals?.length || air.fall ? Array.from({ length: air.fall ? 12 : 16 }, () => mkPetal(false)) : [];
   };
-  const size = () => {
-    const r = canvas.getBoundingClientRect();
+  // The canvas follows its layout box, whenever that box exists or changes.
+  const size = (w: number, h: number) => {
     dp = Math.min(window.devicePixelRatio || 1, 1.5);
-    W = canvas.width = r.width * dp;
-    H = canvas.height = r.height * dp;
+    W = canvas.width = Math.round(w * dp);
+    H = canvas.height = Math.round(h * dp);
     fill();
   };
-  size();
-  on("resize", size);
+  const ro = new ResizeObserver(([entry]) => {
+    const { width, height } = entry!.contentRect;
+    if (width && height) size(width, height);
+  });
+  ro.observe(canvas);
+  disposers.push(() => ro.disconnect());
   world = (n, instant) => {
     airTarget = 0;
     later(() => {

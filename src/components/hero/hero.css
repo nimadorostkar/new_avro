@@ -38,15 +38,6 @@ html:has(.avro) {
   .bgv, .flash, .bit .in, .side i { background-image: image-set(var(--avif) type("image/avif"), var(--webp) type("image/webp")); }
 }
 
-/* tall screens only ever see the middle of the landscape, so they get a centre crop (750x943)
-   sized to the artwork height and centred: it lands exactly where the full image would */
-@media (max-aspect-ratio: 4/5) {
-  .bgv { background-image: var(--webp-p); background-size: auto 100%; }
-  @supports (background-image: image-set(url("a.avif") type("image/avif"))) {
-    .bgv { background-image: image-set(var(--avif-p) type("image/avif"), var(--webp-p) type("image/webp")); }
-  }
-}
-
 /* ---------- scene (cover-fitted artwork, everything inside is in --u units) ---------- */
 .hero { position: fixed; inset: 0; overflow: hidden; perspective: 1400px; }
 .scene {
@@ -338,6 +329,14 @@ html:has(.avro) {
   .rail .nm, .rail .num { display: none; }
   .rail button { min-height: 32px; padding: 0 0 0 16px; }
   .tag { font-size: 11px; }
+}
+/* tall screens only ever see the middle of the landscape, so they get a centre crop (750x943)
+   sized to the artwork height and centred: it lands exactly where the full image would */
+@media (max-aspect-ratio: 4/5) {
+  .bgv { background-image: var(--webp-p); background-size: auto 100%; }
+  @supports (background-image: image-set(url("a.avif") type("image/avif"))) {
+    .bgv { background-image: image-set(var(--avif-p) type("image/avif"), var(--webp-p) type("image/webp")); }
+  }
 }
 @media (max-aspect-ratio: 1/1) {
   .avro { --cs: 0.78; --cty: -30; --bsx: 0.42; --bsy: 0.92; --bk: 0.8; }

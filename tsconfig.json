@@ -36,7 +36,9 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
+  // .next/dev/types duplicates .next/types while `next dev` runs; checking one copy is enough
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".next/dev"
   ]
 }

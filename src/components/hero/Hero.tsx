@@ -50,6 +50,8 @@ function Pic({ base, alt, width, height, lazy, fetchPriority }: PicProps) {
  * Server-rendered markup only. Every element the engine drives carries a
  * `data-*` hook; the engine (client.ts, built to public/hero.js) finds them
  * and takes over once the script loads. Nothing here runs in the browser.
+ * (`suppressHydrationWarning` marks attributes the engine owns: production
+ * ships no React, but `next dev` still hydrates.)
  */
 export function Hero({ drinks }: { drinks: readonly Drink[] }) {
   const first = drinks[0];
@@ -60,7 +62,7 @@ export function Hero({ drinks }: { drinks: readonly Drink[] }) {
       <div className="hero">
         <div className="scene">
           <div className="cam" data-cam>
-            <div className="layer" data-depth=".012">
+            <div className="layer" data-depth=".012" suppressHydrationWarning>
               <div className="bg">
                 {drinks.map((d, i) => (
                   <div key={d.slug} className={eager(i) ? "bgv on" : "bgv"} data-bg={i} {...bgProps(d.bg, i, true)}>
@@ -69,12 +71,12 @@ export function Hero({ drinks }: { drinks: readonly Drink[] }) {
                 ))}
               </div>
             </div>
-            <div className="layer" data-depth=".012">
+            <div className="layer" data-depth=".012" suppressHydrationWarning>
               <div className="sun" data-sun />
             </div>
-            <canvas className="motes" data-motes aria-hidden="true" />
+            <canvas className="motes" data-motes aria-hidden="true" suppressHydrationWarning />
 
-            <div className="layer drops" data-drops data-depth=".02" aria-hidden="true">
+            <div className="layer drops" data-drops data-depth=".02" aria-hidden="true" suppressHydrationWarning>
               {DROPS.map(([x, y, t, delay]) => (
                 <b
                   key={`${x}-${y}`}
@@ -84,7 +86,7 @@ export function Hero({ drinks }: { drinks: readonly Drink[] }) {
               ))}
             </div>
 
-            <div className="layer" data-depth=".05" aria-hidden="true">
+            <div className="layer" data-depth=".05" aria-hidden="true" suppressHydrationWarning>
               <div className="bits">
                 {drinks.map((d, n) => (
                   <div key={d.slug} className={eager(n) ? "set on" : "set"} data-set={n}>
@@ -105,13 +107,13 @@ export function Hero({ drinks }: { drinks: readonly Drink[] }) {
             <div className="splash glow" data-glow />
             <div className="splash ring" data-ring />
 
-            <div className="layer" data-depth=".034">
-              <div className="cupwrap" data-cupwrap>
+            <div className="layer" data-depth=".034" suppressHydrationWarning>
+              <div className="cupwrap" data-cupwrap suppressHydrationWarning>
                 <div className="cuprise">
                   <div className="cuptilt">
                     <div className="cupfloat">
                       {drinks.map((d, i) => (
-                        <div key={d.slug} className={eager(i) ? "cupslot is-active" : "cupslot"} data-slot={i}>
+                        <div key={d.slug} className={eager(i) ? "cupslot is-active" : "cupslot"} data-slot={i} suppressHydrationWarning>
                           <Pic
                             base={d.cup}
                             alt={`AVRO! ${d.name} in a clear cup with a black lid`}
@@ -149,7 +151,7 @@ export function Hero({ drinks }: { drinks: readonly Drink[] }) {
               </div>
             </div>
 
-            <div className="layer sides" data-depth=".075" aria-hidden="true">
+            <div className="layer sides" data-depth=".075" aria-hidden="true" suppressHydrationWarning>
               {drinks.map(
                 (d, i) =>
                   d.sides && (

@@ -10,7 +10,7 @@
     { "label": "ABOUT US", "href": "/about" },
     { "label": "ORDER NOW", "href": "/contact" }
   ],
-  "action": { "label": "LOGIN", "href": "#login" },
+  "action": { "label": "LOGIN", "href": "/login" },
   "routes": [
     { "path": "/", "changeFrequency": "monthly", "priority": 1 },
     { "path": "/menu", "changeFrequency": "monthly", "priority": 0.9 },

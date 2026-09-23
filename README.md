@@ -72,6 +72,15 @@ src/
 
 `/about` and `/contact` are static pages in the hero's visual language (night, glow, corner brackets) set in Persian, right-to-left, with Vazirmatn from `next/font`. Their copy lives in [`src/data/venue.ts`](src/data/venue.ts); the shared frame is [`Shell.tsx`](src/components/site/Shell.tsx). Like the home page they ship no JavaScript.
 
+## Login
+
+`/login` signs people in without a password: a 6-digit code by SMS or email, or "Continue with Google". It is the one page that ships React to the browser (the form in [`LoginForm.tsx`](src/components/auth/LoginForm.tsx)) and is server-rendered so it can show the signed-in state. Codes are issued and checked by `/api/auth/otp/send` and `/api/auth/otp/verify`, with a 60-second resend cooldown, 5 sends per number per hour, 5 wrong tries per code and a 5-minute expiry; the session is an HMAC-signed, HttpOnly cookie ([`src/lib/auth`](src/lib/auth)).
+
+- **Locally** codes are printed to the dev-server log (`[auth] phone code for +98912…: 123456`).
+- **SMS/email provider**: connect one in [`deliver.ts`](src/lib/auth/deliver.ts). Until then production answers "sending unavailable" rather than faking a send.
+- **Google**: set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` and register `<site>/api/auth/google/callback` as a redirect URI. Without them the button returns to the form with a message.
+- **One instance**: pending codes live in process memory ([`otp.ts`](src/lib/auth/otp.ts)); move them to Redis or the database before running more than one server.
+
 ## Editing the menu
 
 Everything a drink needs lives in one object in [`src/data/drinks.ts`](src/data/drinks.ts). To add a drink:
@@ -115,8 +124,8 @@ The opening frame ships only what it shows: one landscape (AVIF, ~66 KB, or a ~3
 
 ## Deployment
 
-The site is fully static (`next build` prerenders every route, and no route ships framework JavaScript). Deploy to Vercel with defaults, or run `npm run build && npm run start` behind any Node host — set `NEXT_PUBLIC_SITE_URL` in the build environment either way.
+Every page except `/login` is prerendered and ships no framework JavaScript; `/login` and `/api/auth/*` need a Node server. Deploy to Vercel with defaults, or run `npm run build && npm run start` behind any Node host — set `NEXT_PUBLIC_SITE_URL` and `AUTH_SECRET` either way (see `.env.example`).
 
 Production responses carry a Content-Security-Policy (`script-src 'self'` plus the hash of the menu page's one inline handler), HSTS, `X-Frame-Options`, `Referrer-Policy` and `Permissions-Policy` (see [`next.config.ts`](next.config.ts)). Artwork under `/backgrounds`, `/cups`, `/sprites`, `/sides` and `/brand`, and `/hero.js`, are served with a one-year immutable cache; rename an artwork file if you replace it (the engine is versioned by content hash automatically).
 
-Still to wire up before launch: the `LOGIN` link (`#login` in `site.json`) has no destination yet; `ORDER NOW` points at the contact page (orders by phone).
+Still to wire up before launch: an SMS/email provider for login codes (see [Login](#login)); `ORDER NOW` points at the contact page (orders by phone).

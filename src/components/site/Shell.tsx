@@ -8,9 +8,11 @@ type Props = {
   /** Page title (shown in the tab) and description (meta + social). */
   title: string;
   description: string;
-  path: "/about" | "/contact" | "/menu";
+  path: "/about" | "/contact" | "/menu" | "/login";
   /** Persian pages read right-to-left; English ones follow the landing page. */
   lang?: "fa" | "en";
+  /** Keep the page out of search results (account pages). */
+  noindex?: boolean;
   children: React.ReactNode;
 };
 
@@ -19,7 +21,7 @@ type Props = {
  * glow and corner brackets as the hero, with a nav that simply wraps on small
  * screens (there is no script to open a menu here, and none is needed).
  */
-export function Shell({ title, description, path, lang = "fa", children }: Props) {
+export function Shell({ title, description, path, lang = "fa", noindex, children }: Props) {
   const url = `${SITE.url}${path}`;
   const dir = lang === "fa" ? "rtl" : "ltr";
   return (
@@ -30,6 +32,7 @@ export function Shell({ title, description, path, lang = "fa", children }: Props
         <meta name="description" content={description} />
         <meta name="theme-color" content="#07110b" />
         <link rel="canonical" href={url} />
+        {noindex && <meta name="robots" content="noindex" />}
         <link rel="icon" href="/icon.svg" type="image/svg+xml" sizes="any" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={SITE.name} />
@@ -54,9 +57,9 @@ export function Shell({ title, description, path, lang = "fa", children }: Props
               {l.label}
             </Link>
           ))}
-          <a className="page-action" href={SITE.action.href}>
+          <Link className="page-action" href={SITE.action.href} aria-current={SITE.action.href === path ? "page" : undefined}>
             {SITE.action.label}
-          </a>
+          </Link>
         </nav>
       </header>
       <main className="page-main" dir={dir} lang={lang}>

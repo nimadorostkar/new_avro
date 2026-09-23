@@ -5,8 +5,7 @@ import config from "./site.json";
  * scripts (robots, sitemap, manifest) read the same source; the canonical
  * origin comes from NEXT_PUBLIC_SITE_URL.
  *
- * Nav notes: ORDER NOW goes to the contact page (orders are taken by phone)
- * and LOGIN is a placeholder until an account area exists.
+ * Nav note: ORDER NOW goes to the contact page (orders are taken by phone).
  */
 export const SITE = {
   ...config,

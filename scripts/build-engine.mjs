@@ -14,6 +14,7 @@ export const options = {
   target: ["es2022", "safari16", "chrome100", "firefox100"],
   tsconfig: "tsconfig.json",
   legalComments: "none",
+  define: { "process.env.NODE_ENV": '"production"' },
   logLevel: "info",
 };
 

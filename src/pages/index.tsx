@@ -63,12 +63,13 @@ export default function HomePage({ engineSrc }: InferGetStaticPropsType<typeof g
         <link rel="preload" as="image" type="image/avif" href={bg.avif} media="(min-aspect-ratio: 4/5)" fetchPriority="high" />
         <link rel="preload" as="image" type="image/avif" href={bgPortrait.avif} media="(max-aspect-ratio: 4/5)" fetchPriority="high" />
         <link rel="preload" as="image" type="image/avif" href={cup.avif} fetchPriority="high" />
-        {/* eslint-disable-next-line @next/next/no-sync-scripts -- module scripts are deferred by definition */}
-        <script type="module" src={engineSrc} />
+        <link rel="modulepreload" href={engineSrc} />
       </Head>
       <main>
         <Hero drinks={DRINKS} />
       </main>
+      {/* eslint-disable-next-line @next/next/no-sync-scripts -- module scripts are deferred by definition */}
+      <script type="module" src={engineSrc} />
     </>
   );
 }

@@ -17,9 +17,16 @@ const styled = (root: HTMLElement) =>
     check();
   });
 
+/** `next dev` still hydrates the page; mutating the DOM before that finishes causes hydration mismatches. */
+const hydrated = () =>
+  new Promise<void>((resolve) => {
+    if (process.env.NODE_ENV === "production" || window.__avroHydrated) return resolve();
+    window.addEventListener("avro:hydrated", () => resolve(), { once: true });
+  });
+
 const root = document.querySelector<HTMLElement>(".avro");
 if (root) {
-  void styled(root).then(() => {
+  void Promise.all([hydrated(), styled(root)]).then(() => {
     mountHero(root, DRINKS);
     mountMenu(root);
   });

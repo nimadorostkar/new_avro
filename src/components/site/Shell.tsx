@@ -53,7 +53,7 @@ export function Shell({ title, description, path, lang = "fa", noindex, children
         </Link>
         <nav className="page-links" aria-label="Primary">
           {SITE.nav.map((l) => (
-            <Link key={l.href} href={l.href} aria-current={l.href === path ? "page" : undefined}>
+            <Link key={l.label} href={l.href} aria-current={l.href === path ? "page" : undefined}>
               {l.label}
             </Link>
           ))}

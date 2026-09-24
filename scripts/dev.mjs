@@ -5,7 +5,12 @@ import { options } from "./build-engine.mjs";
 
 await import("./build-meta.mjs");
 
-const ctx = await context({ ...options, minify: false, logLevel: "warning" });
+const ctx = await context({
+  ...options,
+  minify: false,
+  logLevel: "warning",
+  define: { "process.env.NODE_ENV": '"development"' },
+});
 await ctx.rebuild();
 await ctx.watch();
 
